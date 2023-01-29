@@ -1,0 +1,14 @@
+Partlist
+
+Exported from connector-board.sch at 2023-01-23 20:55:46
+
+EAGLE Version 5.7.0 Copyright (c) 1988-2010 CadSoft
+
+Part     Value          Device     Package                Library  Sheet
+
+CON1     FLIPCHIP_1     FLIPCHIP_1 FLIPCHIP-PCB-CONNECTOR anders   1
+CON2     FLIPCHIP_1     FLIPCHIP_1 FLIPCHIP-PCB-CONNECTOR anders   1
+JP1                     PINHD-2X20 2X20                   pinhead  1
+JP2                     PINHD-2X20 2X20                   pinhead  1
+JP3                     PINHD-2X20 2X20                   pinhead  1
+JP4                     PINHD-2X20 2X20                   pinhead  1

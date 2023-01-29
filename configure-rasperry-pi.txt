@@ -1,0 +1,32 @@
+
+Enable I2C, Set I2C clock to 400kHz
+dtparam=i2c_arm=on
+dtparam=i2c_arm_baudrate=400000
+
+Enable support for ADS1115 ADC
+dtoverlay=ads1115
+dtparam=cha_enable
+dtparam=chb_enable
+dtparam=chc_enable
+dtparam=chd_enable
+
+Add overlay for 1-channel PWM
+dtoverlay=pwm,pin=18,func=2
+
+50% duty, 10kHz
+echo 0 > /sys/class/pwm/pwmchip0/export
+echo 100000 > /sys/class/pwm/pwmchip0/pwm0/period
+echo 50000 > /sys/class/pwm/pwmchip0/pwm0/duty_cycle 
+echo 1 > /sys/class/pwm/pwmchip0/pwm0/enable 
+
+
+git clone https://github.com/mhei/libugpio.git
+sudo apt install autoconf
+sudo apt install libtool
+
+./autoconf.sh
+./configure
+make
+sudo make install
+
+
