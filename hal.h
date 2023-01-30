@@ -58,6 +58,8 @@ int hal_measureVoltage(float *uMeas);
 int hal_setOut(int channel, int data);
 int hal_getInputs (int *data);
 int hal_setup(void);
+void hal_teardown(void);
+int hal_setDefault(void);
 int hal_enableLoad(int current);
 int pin_setFunction(enum fc_pin pin, enum pinFunction function);
 int pin_setMeasure(enum fc_pin pin, int enable);
