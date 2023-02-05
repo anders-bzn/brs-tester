@@ -1,0 +1,13 @@
+# Test for B165, 5 bit inverter with 5 pull downs
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+
+config='pppiodiodiodiodiod------------------'
+vector='---101101101101101------------------'
+vector='---011011011011011------------------'
+vector='---011101101101101------------------'
+vector='---101011101101101------------------'
+vector='---101101011101101------------------'
+vector='---101101101011101------------------'
+vector='---101101101101011------------------'
+

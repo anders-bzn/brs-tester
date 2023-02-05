@@ -15,12 +15,12 @@ enum fc_pin {
 	AM = 10,
 	AN = 11,
 	AP = 12,
-	AR = 13,  
+	AR = 13,
 	AS = 14,
 	AT = 15,
 	AU = 16,
 	AV = 17,
-	BA = 18, 
+	BA = 18,
 	BB = 19,
 	BC = 20,
 	BD = 21,
@@ -55,6 +55,7 @@ enum pinFunction {
 int hal_powerEnable(int on);
 int hal_measureCurrent(float *iMeas);
 int hal_measureVoltage(float *uMeas);
+int hal_measureVoltageRef(float *uMeas);
 int hal_setOut(int channel, int data);
 int hal_getInputs (int *data);
 int hal_setup(void);
@@ -62,6 +63,7 @@ void hal_teardown(void);
 int hal_setDefault(void);
 int hal_enableLoad(int current);
 int pin_setFunction(enum fc_pin pin, enum pinFunction function);
+int pin_getFunction(enum fc_pin pin, enum pinFunction *function);
 int pin_setMeasure(enum fc_pin pin, int enable);
 int pin_enablePullDown(enum fc_pin pin, int enable);
 int pin_setDataOut(enum fc_pin pin, int data);

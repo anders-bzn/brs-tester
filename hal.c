@@ -215,11 +215,13 @@ struct pinSetting {
 };
 
 static const char *pinFunctionStr[] = {
-	[PIN_POWER]    = "POWER",
-	[PIN_INPUT]    = "INPUT",
-	[PIN_OUTPUT]   = "OUTPUT",
-	[PIN_DISABLED] = "DISABLED"
+	[PIN_POWER]	= "POWER",
+	[PIN_GND]	= "GND",
+	[PIN_INPUT]	= "INPUT",
+	[PIN_OUTPUT]	= "OUTPUT",
+	[PIN_DISABLED]	= "DISABLED"
 };
+
 
 /*
  * Mapping between PINS on a flipchip to backplane levelshivers. Not
@@ -625,6 +627,45 @@ int hal_measureVoltage(float *uMeas){
 	return 0;
 }
 
+
+int hal_measureVoltageRef(float *uMeas){
+	float uRef_scale = 0;
+	float uRef_voltage = 0;
+	int c;
+
+	FILE *fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage3_raw", "r");
+
+	if (fp == NULL) {
+		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage3_raw");
+		return -1;
+	}
+
+	c = fscanf(fp, "%f", &uRef_voltage);
+	fclose(fp);
+
+	if (c != 1) {
+		return -1;
+	}
+
+	fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage3_scale", "r");
+
+	if (fp == NULL) {
+		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage3_scale");
+		return -1;
+	}
+
+	c = fscanf(fp, "%f", &uRef_scale);
+	fclose(fp);
+
+	if (c != 1) {
+		return -1;
+	}
+
+	*uMeas = (uRef_scale * uRef_voltage);
+	return 0;
+}
+
+
 int hal_setOut(int channel, int data)
 {
 	if (channel < 0 || channel > 15) {
@@ -634,7 +675,7 @@ int hal_setOut(int channel, int data)
 
 	// Set as output and active low for highest bit
 	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
-		if (channel == 15) {
+		if (channel == LOAD_BOARD_ADR) {
 			// Load board has other pins as active low/high
 			if (i < GPIO_D6) {
 				if (ugpio_set_activelow(GPIOS[i].io, 1) < 0){
@@ -865,6 +906,18 @@ int pin_setFunction(enum fc_pin pin, enum pinFunction function)
 	retVal = hal_setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
 	pinSettings[pin].function = function;
 	return retVal;
+}
+
+
+int pin_getFunction(enum fc_pin pin, enum pinFunction *function)
+{
+	if (pin > LAST_PIN) {
+		printf("ERR: Invalid pin number %d\n", pin);
+		return -1;
+	}
+
+	*function = pinSettings[pin].function;
+	return 0;
 }
 
 
