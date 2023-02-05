@@ -732,54 +732,21 @@ int hal_getInputs (int *data) {
 		}
 	}
 
-	// Enable latch A output
-	ugpio_set_value(GPIOS[GPIO_INP_A_OE].io, 1);
-	usleep(1);
+	for (int k=0; k <= (GPIO_INP_D_OE - GPIO_INP_A_OE); k++) {
+		// Enable latch output
+		ugpio_set_value(GPIOS[GPIO_INP_A_OE+k].io, 1);
+		usleep(1);
 
-	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
-		value = ugpio_get_value(GPIOS[i].io);
-		inputs |= ((value & 1) << (i - GPIO_D0));
+		for (int i = GPIO_D0; i <= GPIO_D7; i++) {
+			value = ugpio_get_value(GPIOS[i].io);
+			inputs |= ((value & 1) << (i - GPIO_D0 + (8 * k)));
+		}
+
+		// Disable latch output
+		ugpio_set_value(GPIOS[GPIO_INP_A_OE+k].io, 0);
 	}
 
-	// Disable latch A output
-	ugpio_set_value(GPIOS[GPIO_INP_A_OE].io, 0);
-
-	// Enable latch B output
-	ugpio_set_value(GPIOS[GPIO_INP_B_OE].io, 1);
-	usleep(1);
-
-	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
-		value = ugpio_get_value(GPIOS[i].io);
-		inputs |= (value & 1) << (i - GPIO_D0 + 8);
-	}
-
-	// Disable latch B output
-	ugpio_set_value(GPIOS[GPIO_INP_B_OE].io, 0);
-
-	// Enable latch C output
-	ugpio_set_value(GPIOS[GPIO_INP_C_OE].io, 1);
-	usleep(1);
-
-	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
-		value = ugpio_get_value(GPIOS[i].io);
-		inputs |= (value & 1) << (i - GPIO_D0 + 16);
-	}
-
-	// Disable latch C output
-	ugpio_set_value(GPIOS[GPIO_INP_C_OE].io, 0);
-
-	// Enable latch D output
-	ugpio_set_value(GPIOS[GPIO_INP_D_OE].io, 1);
-	usleep(1);
-
-	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
-		value = ugpio_get_value(GPIOS[i].io);
-		inputs |= (value & 1) << (i - GPIO_D0 + 24);
-	}
-
-	// Disable latch D output
-	ugpio_set_value(GPIOS[GPIO_INP_D_OE].io, 0);
-	*data=inputs;
+	*data = inputs;
 
 	// Set as output
 	for (int i = GPIO_D0; i <= GPIO_D7; i++) {

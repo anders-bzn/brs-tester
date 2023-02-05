@@ -348,6 +348,7 @@ int checkLogic(char *setup, char *vector){
 
 	for (int pin = AA; pin < LAST_PIN; pin ++) {
 		int data_in;
+		int data_ok=0;
 
 		switch (setup[pin]) {
 		case 'p':
@@ -363,7 +364,11 @@ int checkLogic(char *setup, char *vector){
 			 * Get data in
 			 */
 			pin_getValue(pin, &data_in);
-			printf("%d", data_in);
+
+			if ( vector[pin] == ('0' + data_in)){
+				data_ok = 1;
+			}
+			printf("%c", data_ok ? '0' + data_in : 'F');
 			break;
 		default:
 			printf("ERROR: Format error\n");
@@ -371,6 +376,65 @@ int checkLogic(char *setup, char *vector){
 		}
 	}
 	printf("\n");
+
+	return 0;
+}
+
+#define VECTOR_LENGTH 37
+
+static char config[VECTOR_LENGTH];
+static char *vectors[1000];
+
+int loadVectors(char *filename)
+{
+
+	char str[100];
+
+	FILE *fp = fopen(filename, "r");
+
+	if (fp == NULL) {
+		printf("ERROR: %s\n", filename);
+		return -1;
+	}
+
+	int k=0;
+	while (!feof(fp)) {
+
+		fgets(str, 100, fp);
+
+		/*
+		 * Don't care about comments and newlines
+		 */
+		if (str[0] == '#' || str[0] == '\n')
+			continue;
+
+		if (0 == strncmp("config='", str, 8)){
+			strncpy(config, &str[8], VECTOR_LENGTH);
+			config[VECTOR_LENGTH-1] = '\0';
+		}
+
+		if (0 == strncmp("vector='", str, 8)){
+			vectors[k] = malloc(VECTOR_LENGTH);
+			strncpy(vectors[k], &str[8], VECTOR_LENGTH);
+			vectors[k][VECTOR_LENGTH-1] = '\0';
+			k++;
+			vectors[k] = NULL;
+		}
+	}
+
+
+	int i=0;
+	printf("%s\n", config);
+	while (vectors[i] != NULL){
+		printf("%s\n", vectors[i]);
+		i++;
+	}
+
+
+/* Det är 36 tecken exakt
+pppiodiodiodiodiod------------------
+*/
+	fclose(fp);
 
 	return 0;
 }
@@ -398,6 +462,7 @@ int main (int argc, char *argv[])
 		if ( 0 == strcmp("test", argv[i])){
 			hal_powerEnable(1);
 			usleep(1000000);
+
 			checkVoltages("pppiodiodiodiodiod------------------");
 			setupBoard("pppiodiodiodiodiod------------------");
 			checkPullDown("pppiodiodiodiodiod------------------");
@@ -406,10 +471,15 @@ int main (int argc, char *argv[])
 			checkLogic("pppiodiodiodiodiod------------------","---011101101101101------------------");
 			checkLogic("pppiodiodiodiodiod------------------","---101011101101101------------------");
 			checkLogic("pppiodiodiodiodiod------------------","---101101011101101------------------");
-			checkLogic("pppiodiodiodiodiod------------------","---101101101011101------------------");
+			checkLogic("pppiodiodiodiodiod------------------","---101101101011011------------------");
 			checkLogic("pppiodiodiodiodiod------------------","---101101101101011------------------");
+
 			usleep(100000);
 			hal_powerEnable(0);
+		}
+
+		if ( 0 == strcmp("load", argv[i])){
+			loadVectors("b165.fct");
 		}
 		i++;
 	}
