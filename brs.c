@@ -5,6 +5,23 @@
 #include <string.h>
 #include "hal.h"
 
+
+#define VECTOR_LENGTH 37
+
+static char *vectors[1000];
+
+enum outputType {
+	OPEN_COLLECTOR,
+	NORMAL
+};
+
+struct config {
+	char		pin_def[VECTOR_LENGTH];
+	enum outputType	output_type;
+	int		output_current;
+	float 		input_current;
+};
+
 int selfTest(void) {
 	float voltage_ref;
 	int voltage_ref_ok = 0;
@@ -117,7 +134,8 @@ int selfTest(void) {
 }
 
 
-int setupBoard (char *str){
+int setupBoard (struct config *board_config){
+	char *str = board_config->pin_def;
 
 	/* Setup string can look like this:
 	 * pppiodiodiodiodiod------------------
@@ -155,7 +173,12 @@ int setupBoard (char *str){
 			 */
 			printf("O");
 			pin_setFunction(pin, PIN_INPUT);
-			pin_enablePullDown(pin, 1);
+			/*
+			 * Check if pin is open collector
+			 */
+			if (board_config->output_type == OPEN_COLLECTOR) {
+				pin_enablePullDown(pin, 1);
+			}
 			break;
 		case 'd':
 			/*
@@ -182,7 +205,8 @@ int setupBoard (char *str){
 	return 0;
 }
 
-int checkVoltages(char *str){
+int checkVoltages(struct config *board_config){
+	char *str = board_config->pin_def;
 	float voltage;
 
 	/* Setup string can look like this:
@@ -234,7 +258,8 @@ int checkVoltages(char *str){
 	return 0;
 }
 
-int checkPullDown(char *str){
+int checkPullDown(struct config *board_config){
+	char *str = board_config->pin_def;
 	float voltage_l;
 	float voltage_h;
 	float current;
@@ -283,7 +308,11 @@ int checkPullDown(char *str){
 				voltage_ok = 1;
 			}
 
-			if ( fabs(current + 10.0) < 0.6) {
+			/*
+			 * Nominal current with difference for 10% tolerace on
+			 * resistor values.
+			 */
+			if ( fabs(current + 10.0) < 0.9) {
 				current_ok = 1;
 			}
 
@@ -299,17 +328,8 @@ int checkPullDown(char *str){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-int checkLogic(char *setup, char *vector){
+int checkLogic(struct config *board_config, char *vector){
+	char *setup = board_config->pin_def;
 
 	/* Setup string can look like this:
 	 * pppiodiodiodiodiod------------------
@@ -357,7 +377,6 @@ int checkLogic(char *setup, char *vector){
 		case 'i':
 			printf("-");
 			break;
-
 		case 'd':
 		case 'o':
 			/*
@@ -380,20 +399,14 @@ int checkLogic(char *setup, char *vector){
 	return 0;
 }
 
-#define VECTOR_LENGTH 37
 
-static char config[VECTOR_LENGTH];
-static char *vectors[1000];
-
-int loadVectors(char *filename)
+int loadVectors(char *filename, struct config *board)
 {
-
 	char str[100];
-
 	FILE *fp = fopen(filename, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", filename);
+		printf("ERROR: could not open file '%s'\n", filename);
 		return -1;
 	}
 
@@ -408,40 +421,65 @@ int loadVectors(char *filename)
 		if (str[0] == '#' || str[0] == '\n')
 			continue;
 
-		if (0 == strncmp("config='", str, 8)){
-			strncpy(config, &str[8], VECTOR_LENGTH);
-			config[VECTOR_LENGTH-1] = '\0';
-		}
-
-		if (0 == strncmp("vector='", str, 8)){
+		if (0 == strncmp("output-type='", str, sizeof("output-type='")-1)){
+			if (0 == strncmp("open-collector'", &str[sizeof("output-type='")-1], sizeof("open-collector'"-1))){
+				board->output_type = OPEN_COLLECTOR;
+			} else {
+				board->output_type = NORMAL;
+			}
+		} else 	if (0 == strncmp("input-current='",str, sizeof("input-current='")-1)) {
+			float current = 0;
+			int o;
+			o = sscanf(str, "input-current='%fmA'", &current);
+			if (o == 1) {
+				board->input_current = current;
+			} else {
+				printf("ERROR: Invalid input current");
+				return -1;
+			}
+		} else 	if (0 == strncmp("output-current='",str, sizeof("output-current='")-1)) {
+			int o, current = 0;
+			o = sscanf(str, "output-current='%dmA'", &current);
+			if (o==1 && current >= 0 && current < 127) {
+				board->output_current = current;
+			} else {
+				printf("ERROR: Invalid out-current\n");
+				return -1;
+			}
+		} else if (0 == strncmp("config='", str, 8)){
+			strncpy(board->pin_def, &str[8], VECTOR_LENGTH);
+			board->pin_def[VECTOR_LENGTH-1] = '\0';
+		} else if (0 == strncmp("vector='", str, 8)){
 			vectors[k] = malloc(VECTOR_LENGTH);
 			strncpy(vectors[k], &str[8], VECTOR_LENGTH);
 			vectors[k][VECTOR_LENGTH-1] = '\0';
 			k++;
 			vectors[k] = NULL;
+		} else {
+			printf("ERROR: Unknown key: %s", str);
+			return -1;
 		}
 	}
 
-
-	int i=0;
-	printf("%s\n", config);
-	while (vectors[i] != NULL){
-		printf("%s\n", vectors[i]);
-		i++;
-	}
-
-
-/* Det är 36 tecken exakt
-pppiodiodiodiodiod------------------
-*/
 	fclose(fp);
-
 	return 0;
+}
+
+
+void print_usage(char *name)
+{
+	printf("USAGE: %s\n", name);
+	printf("      --help                - This help\n");
+	printf("      --selftest            - Run hardware test\n");
+	printf("   -b --board <filename>    - Test board with testvector in <filename>\n");
+	printf("   -l --loop <num of loops> - Loop test\n");
+
 }
 
 
 int main (int argc, char *argv[])
 {
+	int loops=1;
 
 	for (int i = 0; i < argc; i++){
 		printf("ARG[%d] %s\n",i, argv[i]);
@@ -455,31 +493,50 @@ int main (int argc, char *argv[])
 	int i = 0;
 
 	while (i < argc){
-		if ( 0 == strcmp("selftest", argv[i])){
+		if ( 0 == strcmp("--help", argv[i])){
+			print_usage(argv[0]);
+		}
+
+		if ( 0 == strcmp("--selftest", argv[i]) && argc == 2){
+			/*
+			 * Run selftest exclusive
+			 */
 			selfTest();
 		}
 
-		if ( 0 == strcmp("test", argv[i])){
+		if (( 0 == strcmp("--loop", argv[i]) && (argc - 1) > i) ||
+		    ( 0 == strcmp("-l", argv[i]) && (argc - 1) > i)){
+
+			if (sscanf(argv[i+1], "%d", &loops) != 1){
+				printf ("Error: Number of loops %s\n", argv[i+1]);
+				return -1;
+			}
+		}
+
+		if (( 0 == strcmp("-b", argv[i]) && (argc - 1) > i) ||
+		    ( 0 == strcmp("--board", argv[i]) && (argc - 1) > i)){
+			struct config board_config;
+
+			loadVectors(argv[i+1], &board_config);
 			hal_powerEnable(1);
 			usleep(1000000);
+			checkVoltages(&board_config);
+			setupBoard(&board_config);
+			checkPullDown(&board_config);
 
-			checkVoltages("pppiodiodiodiodiod------------------");
-			setupBoard("pppiodiodiodiodiod------------------");
-			checkPullDown("pppiodiodiodiodiod------------------");
-			checkLogic("pppiodiodiodiodiod------------------","---011011011011011------------------");
-			checkLogic("pppiodiodiodiodiod------------------","---101101101101101------------------");
-			checkLogic("pppiodiodiodiodiod------------------","---011101101101101------------------");
-			checkLogic("pppiodiodiodiodiod------------------","---101011101101101------------------");
-			checkLogic("pppiodiodiodiodiod------------------","---101101011101101------------------");
-			checkLogic("pppiodiodiodiodiod------------------","---101101101011011------------------");
-			checkLogic("pppiodiodiodiodiod------------------","---101101101101011------------------");
+			int l=0;
+
+			while (l < loops) {
+				int k=0;
+				while(vectors[k] != NULL) {
+					checkLogic(&board_config, vectors[k]);
+					k++;
+				}
+				l++;
+			 }
 
 			usleep(100000);
 			hal_powerEnable(0);
-		}
-
-		if ( 0 == strcmp("load", argv[i])){
-			loadVectors("b165.fct");
 		}
 		i++;
 	}
@@ -490,3 +547,18 @@ int main (int argc, char *argv[])
 	return 0;
 }
 
+/*
+ TODO list of things to implement
+ --------------------------------
+ [ ] Test input current
+ [ ] Test output drive strengt
+ [ ] Loop testing
+ [ ] Free testvectors
+ [ ] What and where should result be printed
+ [ ] udev rule to initiate board and export gpios
+ [ ] Single step testing
+ [ ] Validate test vectors more (validate characters)
+ [ ] Move out test functions to own file
+ [ ] Let Makefile install everything?
+ [ ] Parse first, then execute 
+*/

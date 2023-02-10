@@ -1,0 +1,12 @@
+# Test for B133, 4 bit NAND with 3 pull downs
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppiiodiiodiiodiio------------------'
+vector='---101110111011101------------------'
+vector='---011101110111011------------------'
+vector='---001100110011001------------------'
+vector='---110111011101110------------------'
+
+output-type='open-collector'
+input-current='1.0mA'
+output-current='8mA'
