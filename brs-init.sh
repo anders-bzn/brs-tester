@@ -9,4 +9,4 @@ for GPIO in $GPIOS; do {
 
 sleep 1
 
-brs_tester
+brs_tester --init

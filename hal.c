@@ -41,7 +41,10 @@ struct gpio {
 	ugpio_t *io;
 };
 
-
+/*
+ * Array of struct that holds refrences to all GPIO's. Maps defines and
+ * initial configuration to all pin numbers.
+ */
 struct gpio GPIOS[] = {
 	[GPIO_ENABLE_POWER].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_ENABLE_POWER].active_low = 0,
@@ -473,6 +476,59 @@ static struct pinSetting pinSettings[] = {
 
 
 /*
+ * Clock out data to a board
+ */
+static int setOut(int channel, int data)
+{
+	if (channel < 0 || channel > 15) {
+		printf("ERR: invalid board index\n");
+		return -1;
+	}
+
+	// Set as output and active low for highest bit
+	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
+		if (channel == LOAD_BOARD_ADR) {
+			// Load board has other pins as active low/high
+			if (i < GPIO_D6) {
+				if (ugpio_set_activelow(GPIOS[i].io, 1) < 0){
+					return -1;
+				}
+			} else {
+				if (ugpio_set_activelow(GPIOS[i].io, 0) < 0){
+					return -1;
+				}
+			}
+		} else {
+			if (i < GPIO_D4) {
+				if (ugpio_set_activelow(GPIOS[i].io, 0) < 0){
+					return -1;
+				}
+			} else {
+				if (ugpio_set_activelow(GPIOS[i].io, 1) < 0){
+					return -1;
+				}
+			}
+		}
+	}
+
+
+	ugpio_set_value(GPIOS[GPIO_SELECT_A].io, channel & 1);
+	ugpio_set_value(GPIOS[GPIO_SELECT_B].io, (channel >> 1) & 1);
+	ugpio_set_value(GPIOS[GPIO_SELECT_C].io, (channel >> 2) & 1);
+	ugpio_set_value(GPIOS[GPIO_SELECT_D].io, (channel >> 3) & 1);
+
+	for (int i = 0; i <= 7; i++) {
+		ugpio_set_value(GPIOS[i + GPIO_D0].io, (data >> i) & 1);
+	}
+
+	ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 1);
+	usleep(1);
+	ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 0);
+	return 0;
+}
+
+
+/*
  * Enable/disable power to a flipchip
  */
 int hal_powerEnable(int on) {
@@ -486,6 +542,10 @@ int hal_powerEnable(int on) {
 }
 
 
+/*
+ * Measure the current between the levelshifter and the flipchip pin
+ * under test.
+ */
 int hal_measureCurrent(float *iMeas){
 	float uRef_scale = 0;
 	float uRef_voltage = 0;
@@ -555,6 +615,10 @@ int hal_measureCurrent(float *iMeas){
 	return 0;
 }
 
+
+/*
+ * Measure the voltage on a flipchip pin under test.
+ */
 int hal_measureVoltage(float *uMeas){
 	float uRef_scale = 0;
 	float uRef_voltage = 0;
@@ -618,16 +682,20 @@ int hal_measureVoltage(float *uMeas){
 		return -1;
 	}
 
-	// Many magical numbers here. The +15/-15 V is divided with 150k and 12K ohm resistor
-	// to a reference voltage of about 1.7 V. This means that the voltage range is mapped
-	// to a voltage ~0.5 V to 2.7 V to fit in the ADC range. The calulation gets the real
-	// voltage from the ADC range. In millivolts!
-
+	/*
+	 * Many magical numbers here. The +15/-15 V is divided with 150k and 12K ohm resistor
+	 * to a reference voltage of about 1.7 V. This means that the voltage range is mapped
+	 * to a voltage ~0.5 V to 2.7 V to fit in the ADC range. The calulation gets the real
+	 * voltage from the ADC range. In millivolts!
+	 */
 	*uMeas = ((float)(150.0/12.0) * ((uRaw_scale * uRaw_voltage) - (uRef_scale * uRef_voltage))) + (uRaw_scale * uRaw_voltage);
 	return 0;
 }
 
 
+/*
+ * Returns the 1.7V reference voltage.
+ */
 int hal_measureVoltageRef(float *uMeas){
 	float uRef_scale = 0;
 	float uRef_voltage = 0;
@@ -666,56 +734,10 @@ int hal_measureVoltageRef(float *uMeas){
 }
 
 
-int hal_setOut(int channel, int data)
-{
-	if (channel < 0 || channel > 15) {
-		printf("ERR: invalid board index\n");
-		return -1;
-	}
-
-	// Set as output and active low for highest bit
-	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
-		if (channel == LOAD_BOARD_ADR) {
-			// Load board has other pins as active low/high
-			if (i < GPIO_D6) {
-				if (ugpio_set_activelow(GPIOS[i].io, 1) < 0){
-					return -1;
-				}
-			} else {
-				if (ugpio_set_activelow(GPIOS[i].io, 0) < 0){
-					return -1;
-				}
-			}
-		} else {
-			if (i < GPIO_D4) {
-				if (ugpio_set_activelow(GPIOS[i].io, 0) < 0){
-					return -1;
-				}
-			} else {
-				if (ugpio_set_activelow(GPIOS[i].io, 1) < 0){
-					return -1;
-				}
-			}
-		}
-	}
-
-
-	ugpio_set_value(GPIOS[GPIO_SELECT_A].io, channel & 1);
-	ugpio_set_value(GPIOS[GPIO_SELECT_B].io, (channel >> 1) & 1);
-	ugpio_set_value(GPIOS[GPIO_SELECT_C].io, (channel >> 2) & 1);
-	ugpio_set_value(GPIOS[GPIO_SELECT_D].io, (channel >> 3) & 1);
-
-	for (int i = 0; i <= 7; i++) {
-		ugpio_set_value(GPIOS[i + GPIO_D0].io, (data >> i) & 1);
-	}
-
-	ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 1);
-	usleep(1);
-	ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 0);
-	return 0;
-}
-
-
+/*
+ * First latch all inputs from the level-shifter boards. Then change the
+ * bus to inputs and read data from one latch at a time.
+ */
 int hal_getInputs (int *data) {
 	int value=0;
 	int inputs=0;
@@ -756,6 +778,9 @@ int hal_getInputs (int *data) {
 }
 
 
+/*
+ * Initialize all GPIO's
+ */
 int hal_setup(void){
 	for (int j = GPIO_ENABLE_POWER; j < LAST_GPIO; j++){
 		GPIOS[j].io = ugpio_request_one(GPIOS[j].num, GPIOS[j].flags, "");
@@ -786,7 +811,9 @@ int hal_setup(void){
 	return 0;
 }
 
-
+/*
+ * Close all fd's to the GPIO's in the sysfs filesystem.
+ */
 void hal_teardown(void){
 	for (int j = GPIO_ENABLE_POWER; j < LAST_GPIO; j++){
 		ugpio_close(GPIOS[GPIO_ENABLE_POWER].io);
@@ -796,11 +823,14 @@ void hal_teardown(void){
 }
 
 
+/*
+ * Set all functions on all level-shifter board to a disabled state.
+ */
 int hal_setDefault(void)
 {
 	for (int i = 0; i < NUM_BOARDS; i++) {
 		boards[i].data.data = 0;
-		if (hal_setOut(i, boards[i].data.data) < 0){
+		if (setOut(i, boards[i].data.data) < 0){
 			return -1;
 		}
 	}
@@ -808,6 +838,11 @@ int hal_setDefault(void)
 }
 
 
+/*
+ * Enable a resitor load on the measurement bus. The current can be set
+ * from 0 to 126mA. Where 0 is disable. This can be used to verify drive
+ * strength of output transistors on flipchips.
+ */
 int hal_enableLoad(int current)
 {
 	int retVal = 0;
@@ -819,11 +854,20 @@ int hal_enableLoad(int current)
 
 	boards[LOAD_BOARD_ADR].data.load.enable = (current == 0) ? 0 : 1;
 	boards[LOAD_BOARD_ADR].data.load.current = current >> 1;
-	retVal = hal_setOut(boards[LOAD_BOARD_ADR].address, boards[LOAD_BOARD_ADR].data.data);
+	retVal = setOut(boards[LOAD_BOARD_ADR].address, boards[LOAD_BOARD_ADR].data.data);
 	return retVal;
 }
 
 
+/*
+ * Set function on a pin
+ *
+ * PIN_OUTPUT   - Input on flipchip
+ * PIN_INPUT    - Output on flipchip
+ * PIN_POWER    - ABC Pins are always power and can not be changed nor measured
+ * PIN_DISABLED - Pin is not used and is disconnected
+ * PIN_GND      - Pin must be grounded on flipchip
+ */
 int pin_setFunction(enum fc_pin pin, enum pinFunction function)
 {
 	int retVal = 0;
@@ -870,12 +914,15 @@ int pin_setFunction(enum fc_pin pin, enum pinFunction function)
 		}
 	}
 
-	retVal = hal_setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
+	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
 	pinSettings[pin].function = function;
 	return retVal;
 }
 
 
+/*
+ * Return the actual function of a pin.
+ */
 int pin_getFunction(enum fc_pin pin, enum pinFunction *function)
 {
 	if (pin > LAST_PIN) {
@@ -888,6 +935,10 @@ int pin_getFunction(enum fc_pin pin, enum pinFunction *function)
 }
 
 
+/*
+ * Connect a pin to the measeurement circuitry. There is no check if more
+ * then one pin is enabled at the same time so be careful.
+ */
 int pin_setMeasure(enum fc_pin pin, int enable)
 {
 	int retVal = 0;
@@ -909,11 +960,15 @@ int pin_setMeasure(enum fc_pin pin, int enable)
 		pinSettings[pin].b->data.level.meas2 = (enable) ? 1 : 0;
 	}
 
-	retVal = hal_setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
+	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
 	return retVal;
 }
 
 
+/*
+ * When a pin is input, pull down can be enabled. Used when output is
+ * open-collector
+ */
 int pin_enablePullDown(enum fc_pin pin, int enable)
 {
 	int retVal = 0;
@@ -934,11 +989,14 @@ int pin_enablePullDown(enum fc_pin pin, int enable)
 		pinSettings[pin].b->data.level.pd2 = (enable) ? 1 : 0;
 	}
 
-	retVal = hal_setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
+	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
 	return retVal;
 }
 
 
+/*
+ * Set data out on a pin
+ */
 int pin_setDataOut(enum fc_pin pin, int data)
 {
 	int retVal = 0;
@@ -953,7 +1011,9 @@ int pin_setDataOut(enum fc_pin pin, int data)
 		return -1;
 	}
 
-	// Setting do bit ties the pin to ground. "0" defined as 0 so invert
+	/*
+	 * Setting do bit ties the pin to ground. "0" defined as 0 so invert
+	 */
 	if (pinSettings[pin].bitOffset == 1) {
 		pinSettings[pin].b->data.level.do1 = (data) ? 0 : 1;
 		pinSettings[pin].b->data.level.pd1 = (data) ? 1 : 0;
@@ -962,11 +1022,14 @@ int pin_setDataOut(enum fc_pin pin, int data)
 		pinSettings[pin].b->data.level.pd2 = (data) ? 1 : 0;
 	}
 
-	retVal = hal_setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
+	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
 	return retVal;
 }
 
 
+/*
+ * Tie a pin to ground
+ */
 int pin_setGnd(enum fc_pin pin, int data)
 {
 	int retVal = 0;
@@ -988,11 +1051,14 @@ int pin_setGnd(enum fc_pin pin, int data)
 		pinSettings[pin].b->data.level.do2 = (data) ? 1 : 0;
 	}
 
-	retVal = hal_setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
+	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
 	return retVal;
 }
 
 
+/*
+ * Get the digital value of a pin
+ */
 int pin_getValue(enum fc_pin pin, int *val)
 {
 	int data;
@@ -1015,6 +1081,9 @@ int pin_getValue(enum fc_pin pin, int *val)
 }
 
 
+/*
+ * Get name from pin index.
+ */
 int pin_getName(enum fc_pin pin, char **str)
 {
 	if (pin > LAST_PIN) {
@@ -1025,19 +1094,4 @@ int pin_getName(enum fc_pin pin, char **str)
 
 	*str = (char *)pinSettings[pin].name;
 	return 0;
-}
-
-
-void dump_pinSettings(void)
-{
-	for (int i=AA; i < LAST_PIN; i++) {
-		printf ("Pin: %2.2d %s, boardAddress: %2d, bitOffset: %2d, inputMask %8.8x, %8.8x Function: %s\n",
-			pinSettings[i].pinNumber,
-			pinSettings[i].name,
-			pinSettings[i].b ? pinSettings[i].b->address : -1,
-			pinSettings[i].bitOffset,
-			pinSettings[i].inputBitMask,
-			pinSettings[i].b ? pinSettings[i].b->data.data : -1,
-			pinFunctionStr[pinSettings[i].function]);
-	}
 }

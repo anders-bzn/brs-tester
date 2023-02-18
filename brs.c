@@ -7,17 +7,11 @@
 
 
 #define VECTOR_LENGTH 37
-
 static char *vectors[1000];
 
-enum outputType {
-	OPEN_COLLECTOR,
-	NORMAL
-};
 
 struct config {
 	char		pin_def[VECTOR_LENGTH];
-	enum outputType	output_type;
 	int		output_current;
 	float 		input_current;
 };
@@ -143,6 +137,7 @@ int setupBoard (struct config *board_config){
 	 * 'p' - power pin, do nothing
 	 * 'i' - input pin on testet board
 	 * 'o' - output pin on tested board
+	 * 'O' - output pin on tested board, open collector
 	 * 'd' - pull down net on tested board
 	 * 'g' - pin should be grounded on tested board
 	 * '-' - pin should not be used
@@ -151,7 +146,7 @@ int setupBoard (struct config *board_config){
 	for (int pin = AA; pin < LAST_PIN; pin ++) {
 		switch (str[pin]) {
 		case 'p':
-			printf("P");
+			printf("p");
 			break;
 		case '-':
 			printf("-");
@@ -162,8 +157,16 @@ int setupBoard (struct config *board_config){
 			 * The format string descripbes the board under
 			 * test.
 			 */
-			printf("I");
+			printf("i");
 			pin_setFunction(pin, PIN_OUTPUT);
+			break;
+		case 'O':
+			/*
+			 * Open collector need pull down.
+			 */
+			printf("O");
+			pin_setFunction(pin, PIN_INPUT);
+			pin_enablePullDown(pin, 1);
 			break;
 		case 'o':
 			/*
@@ -171,14 +174,8 @@ int setupBoard (struct config *board_config){
 			 * The format string descripbes the board under
 			 * test.
 			 */
-			printf("O");
+			printf("o");
 			pin_setFunction(pin, PIN_INPUT);
-			/*
-			 * Check if pin is open collector
-			 */
-			if (board_config->output_type == OPEN_COLLECTOR) {
-				pin_enablePullDown(pin, 1);
-			}
 			break;
 		case 'd':
 			/*
@@ -186,14 +183,14 @@ int setupBoard (struct config *board_config){
 			 * The format string descripbes the board under
 			 * test. Setup pull down as input???
 			 */
-			printf("D");
+			printf("d");
 			pin_setFunction(pin, PIN_INPUT);
 			break;
 		case 'g':
 			/*
 			 * NOTE: Pin should be tied to ground dring test
 			 */
-			printf("G");
+			printf("g");
 			pin_setFunction(pin, PIN_GND);
 			break;
 		default:
@@ -215,6 +212,7 @@ int checkVoltages(struct config *board_config){
 	 * 'p' - power pin, do nothing
 	 * 'i' - input pin on testet board
 	 * 'o' - output pin on tested board
+	 * 'O' - output pin on tested board, open collector
 	 * 'd' - pull down net on tested board
 	 * 'g' - pin should be grounded on tested board
 	 * '-' - pin should not be used
@@ -230,10 +228,11 @@ int checkVoltages(struct config *board_config){
 		case 'p':
 		case 'g':
 		case '-':
+		case 'i':
 			printf("PIN: %s %c\n", pinName, str[pin]);
 			break;
-		case 'i':
 		case 'o':
+		case 'O':
 		case 'd':
 			/*
 			 * Check that voltage are in valid range
@@ -270,6 +269,7 @@ int checkPullDown(struct config *board_config){
 	 * 'p' - power pin, do nothing
 	 * 'i' - input pin on testet board
 	 * 'o' - output pin on tested board
+	 * 'O' - output pin on tested board, open collector
 	 * 'd' - pull down net on tested board
 	 * 'g' - pin should be grounded on tested board
 	 * '-' - pin should not be used
@@ -288,6 +288,7 @@ int checkPullDown(struct config *board_config){
 		case '-':
 		case 'i':
 		case 'o':
+		case 'O':
 //			printf("-", pinName, str[pin]);
 			break;
 		case 'd':
@@ -337,6 +338,7 @@ int checkLogic(struct config *board_config, char *vector){
 	 * 'p' - power pin, do nothing
 	 * 'i' - input pin on testet board
 	 * 'o' - output pin on tested board
+	 * 'O' - output pin on tested board, open collector
 	 * 'd' - pull down net on tested board
 	 * 'g' - pin should be grounded on tested board
 	 * '-' - pin should not be used
@@ -349,6 +351,7 @@ int checkLogic(struct config *board_config, char *vector){
 		case '-':
 		case 'd':
 		case 'o':
+		case 'O':
 			printf("%c", vector[pin]);
 			break;
 
@@ -379,6 +382,7 @@ int checkLogic(struct config *board_config, char *vector){
 			break;
 		case 'd':
 		case 'o':
+		case 'O':
 			/*
 			 * Get data in
 			 */
@@ -421,13 +425,7 @@ int loadVectors(char *filename, struct config *board)
 		if (str[0] == '#' || str[0] == '\n')
 			continue;
 
-		if (0 == strncmp("output-type='", str, sizeof("output-type='")-1)){
-			if (0 == strncmp("open-collector'", &str[sizeof("output-type='")-1], sizeof("open-collector'"-1))){
-				board->output_type = OPEN_COLLECTOR;
-			} else {
-				board->output_type = NORMAL;
-			}
-		} else 	if (0 == strncmp("input-current='",str, sizeof("input-current='")-1)) {
+		if (0 == strncmp("input-current='",str, sizeof("input-current='")-1)) {
 			float current = 0;
 			int o;
 			o = sscanf(str, "input-current='%fmA'", &current);
@@ -481,6 +479,8 @@ int main (int argc, char *argv[])
 {
 	int loops=1;
 
+	memset(vectors, 0, sizeof(vectors[1000]));
+
 	for (int i = 0; i < argc; i++){
 		printf("ARG[%d] %s\n",i, argv[i]);
 	}
@@ -525,7 +525,6 @@ int main (int argc, char *argv[])
 			checkPullDown(&board_config);
 
 			int l=0;
-
 			while (l < loops) {
 				int k=0;
 				while(vectors[k] != NULL) {
@@ -537,6 +536,13 @@ int main (int argc, char *argv[])
 
 			usleep(100000);
 			hal_powerEnable(0);
+
+			int k=0;
+			while(vectors[k] != NULL) {
+				free(vectors[k]);
+				vectors[k]  = NULL;
+				k++;
+			}
 		}
 		i++;
 	}
@@ -552,13 +558,17 @@ int main (int argc, char *argv[])
  --------------------------------
  [ ] Test input current
  [ ] Test output drive strengt
- [ ] Loop testing
- [ ] Free testvectors
+ [x] Loop testing
+ [x] Free testvectors
  [ ] What and where should result be printed
- [ ] udev rule to initiate board and export gpios
+ [x] udev rule to initiate board and export gpios
  [ ] Single step testing
  [ ] Validate test vectors more (validate characters)
  [ ] Move out test functions to own file
- [ ] Let Makefile install everything?
- [ ] Parse first, then execute 
+ [x] Let Makefile install everything?
+ [ ] Parse first, then execute
+ [x] udev does not run the script. Absoulte path?
+ [ ] Break on failures
+ [x] Clean up hal.c (return when error, handle errors)
+
 */

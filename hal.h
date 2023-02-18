@@ -56,7 +56,6 @@ int hal_powerEnable(int on);
 int hal_measureCurrent(float *iMeas);
 int hal_measureVoltage(float *uMeas);
 int hal_measureVoltageRef(float *uMeas);
-int hal_setOut(int channel, int data);
 int hal_getInputs (int *data);
 int hal_setup(void);
 void hal_teardown(void);
