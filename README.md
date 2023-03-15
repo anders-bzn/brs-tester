@@ -1,4 +1,4 @@
-#About the brs-tester
+# About the brs-tester
 
 This project implements a tester for DEC flipchips in the B/R/S series.
 Those modules is used in PDP-8, PDP-8/S, PDP-9 and PDP-10 with KA processor.
@@ -13,7 +13,7 @@ The software runs on a Raspberry Pi.
 
 ![BRS-tester](https://www.abc80.net/pics/brs-tester.jpg)
 
-##Electronics
+## Electronics
 The major parts is:
 
 - Levelshifter boards
@@ -21,15 +21,15 @@ The major parts is:
 - Power supply
 - Load module
 
-###Levelshifter boards
+### Levelshifter boards
 There are fifteen boards that takes two pins each and can act as an input/outout levelshifter to 3.3 V TTL levels from 0 and -3 V levels. Every pin can be completely disconnect by a relay. Every pin can also be connected to the measurement bus.
-###Backplane board
+### Backplane board
 The backplane contains glue logic and a measurement circuit. It also interconnects all signals between the other boards.
-###Power supply
+### Power supply
 Makes all voltages needed for the tester.
-###Load module
+### Load module
 The load module can connect different resistors to the measurement bus in order to load test outputs from flipchips.
-##Software
+## Software
 For the time beeing the software is run from a shell and takes different
 input parameters. Run  brs-tester --help to get help text. When a board is
 tested i takes a file with test vectors.
@@ -39,13 +39,13 @@ a shell script that will export all necessary GPIO pins and run
 'brs-tester --init'. This will initialize the tester and put the hardware
 in a known state.
 
-##Using the tester
+## Using the tester
 TBD
 
-##Test vectors
+## Test vectors
 TBD
 
-##Setting up the Raspberry Pi
+## Setting up the Raspberry Pi
 In /boot/config.txt
 Enable I2C, Set I2C clock to 400kHz
 
