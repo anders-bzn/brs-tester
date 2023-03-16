@@ -42,10 +42,10 @@ R21      750R           R-EU_R0805    R0805        2
 R22      187R           R-EU_R0805    R0805        2
 R23      187R           R-EU_R0805    R0805        2
 R24      187R           R-EU_R0805    R0805        2
-T1       2N7002         IRLML0100TR   SOT23        2
-T2       2N7002         IRLML0100TR   SOT23        2
-T3       2N7002         IRLML0100TR   SOT23        2
-T4       2N7002         IRLML0100TR   SOT23        2
-T5       2N7002         IRLML0100TR   SOT23        2
-T9       2N7002         IRLML0100TR   SOT23        2
-T10      2N7002         IRLML0100TR   SOT23        2
+T1       AO3004A        AO3004A       SOT23        2
+T2       AO3004A        AO3004A       SOT23        2
+T3       AO3004A        AO3004A       SOT23        2
+T4       AO3004A        AO3004A       SOT23        2
+T5       AO3004A        AO3004A       SOT23        2
+T9       AO3004A        AO3004A       SOT23        2
+T10      AO3004A        AO3004A       SOT23        2

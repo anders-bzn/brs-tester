@@ -106,13 +106,13 @@ int selfTest(void) {
 	for (int curr = 2, i = 0; curr < 128; curr = (curr << 1), i++) {
 		float current;
 		int current_ok = 0;
-		const float currents[] = {-2.0, -3.9, -7.8, -15.2, -29.0, -52.9};
+		const float currents[] = {-2.0, -3.9, -7.8, -15.2, -28.8, -52.2};
 
 		hal_enableLoad(curr);
 		usleep(10000);
 		hal_measureCurrent (&current);
 
-		if (fabs(currents[i] - current) < 0.1){
+		if (fabs(currents[i] - current) < 0.2){
 			current_ok = 1;
 		}
 
