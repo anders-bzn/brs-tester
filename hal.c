@@ -227,8 +227,8 @@ static const char *pinFunctionStr[] = {
 
 
 /*
- * Mapping between PINS on a flipchip to backplane levelshivers. Not
- * All pins are possible to test, like power and ground. But have them
+ * Mapping between PINS on a flipchip to backplane levelshifters. Not
+ * all pins are possible to test, like power and ground. But have them
  * in the list anyway.
  */
 static struct pinSetting pinSettings[] = {
@@ -529,7 +529,7 @@ static int setOut(int channel, int data)
 
 
 /*
- * Enable/disable power to a flipchip
+ * Enable/disable power to the flipchip under test
  */
 int hal_powerEnable(int on) {
 	int ret = ugpio_set_value(GPIOS[GPIO_ENABLE_POWER].io, on);
@@ -1020,6 +1020,52 @@ int pin_setDataOut(enum fc_pin pin, int data)
 	} else {
 		pinSettings[pin].b->data.level.do2 = (data) ? 0 : 1;
 		pinSettings[pin].b->data.level.pd2 = (data) ? 1 : 0;
+	}
+
+	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
+	return retVal;
+}
+
+
+/*
+ * Toggle a pin as fast as possible. Gives about 130kHz on IO pin (with RPI4).
+ */
+int pin_toggleData(enum fc_pin pin, int toggles)
+{
+	int retVal = 0;
+
+	if (pin > LAST_PIN) {
+		printf("ERR: Invalid pin number %d\n", pin);
+		return -1;
+	}
+
+	if (pinSettings[pin].function != PIN_OUTPUT) {
+		printf("ERR: Invalid pin function PIN_%s\n", pinFunctionStr[pinSettings[pin].function]);
+		return -1;
+	}
+
+	// Set output, this ensures that the bus will have the right bits set.
+	// Also, the right address is set.
+	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
+	if (retVal != 0) {
+		return -1;
+	}
+
+	if (pinSettings[pin].bitOffset == 1) {
+		ugpio_set_value(GPIOS[GPIO_D4].io, 1);
+	} else {
+		ugpio_set_value(GPIOS[GPIO_D6].io, 1);
+	}
+
+	for (int i=0; i<toggles; i++){
+		if (pinSettings[pin].bitOffset == 1) {
+			ugpio_set_value(GPIOS[GPIO_D5].io, i & 1);
+		} else {
+			ugpio_set_value(GPIOS[GPIO_D7].io, i & 1);
+		}
+
+		ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 1);
+		ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 0);
 	}
 
 	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
