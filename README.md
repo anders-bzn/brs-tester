@@ -1,15 +1,13 @@
 # About the brs-tester
 
 This project implements a tester for DEC flipchips in the B/R/S series.
-Those modules is used in PDP-8, PDP-8/S, PDP-9 and PDP-10 with KA processor.
+Those modules are used in PDP-8, PDP-8/S, PDP-9 and in PDP-10 with KA processor.
 This project was created as a part of the restoration os the PDP-9 with
-serial numner 203.
+serial number 203.
 
-The modules uses 0 and -3V volts for the logical 0 and 1.
+The modules uses 0 and -3V volts for the logical 0 and 1. The tester can detect both logical and electrical failures.
 
-The project can test for both logical and electrical failures.
-
-The software runs on a Raspberry Pi.
+The software runs on a Raspberry Pi with [Raspberry Pi OS](https://www.raspberrypi.com/software/).
 
 ![BRS-tester](https://www.abc80.net/pics/brs-tester.jpg)
 
