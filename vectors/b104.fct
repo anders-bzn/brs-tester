@@ -1,0 +1,26 @@
+# Test for B104, four inverters and three loads
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppgiOdgiOdgiOdgiO------------------'
+vector='----101-101-101-10------------------'
+vector='----011-101-101-10------------------'
+vector='----101-011-101-10------------------'
+vector='----101-101-011-10------------------'
+vector='----101-101-101-01------------------'
+vector='----011-011-101-10------------------'
+vector='----011-101-011-10------------------'
+vector='----011-101-101-01------------------'
+vector='----011-011-011-10------------------'
+vector='----011-011-101-01------------------'
+vector='----011-011-011-01------------------'
+
+load-low='-3700mV'
+load-low-margin='200mV'
+load-high='-50mV'
+load-high-margin='100mV'
+load-current='-10mA'
+load-current-margin='1mA'
+logic-input-current='0.9mA'
+logic-input-current-margin='0.2mA'
+logic-high='-110mV'
+output-drive-strenght='16mA'

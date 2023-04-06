@@ -1,7 +1,7 @@
 BIN = brs_tester
 CFLAGS = -g -Wall -O3
-CFILES=hal.c brs.c
-HFILES=hal.h
+CFILES=hal.c brs.c vector.c tests.c
+HFILES=hal.h vector.h tests.h
 LIBS=ugpio
 RULES_DIR=/usr/lib/udev/rules.d
 BIN_DIR=/usr/local/bin

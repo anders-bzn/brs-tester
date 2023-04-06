@@ -1,0 +1,11 @@
+# Test for W005, clamped load
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppddddddddddddddd------------------'
+
+load-low='-3700mV'
+load-low-margin='200mV'
+load-high='-50mV'
+load-high-margin='100mV'
+load-current='-5mA'
+load-current-margin='0.5mA'
