@@ -1,8 +1,8 @@
-Part     Value          Device     Package                Sheet
+Part     Value          Package                Sheet
 
-CON1     FLIPCHIP_1     FLIPCHIP_1 FLIPCHIP-PCB-CONNECTOR 1
-CON2     FLIPCHIP_1     FLIPCHIP_1 FLIPCHIP-PCB-CONNECTOR 1
-JP1                     PINHD-2X20 2X20                   1
-JP2                     PINHD-2X20 2X20                   1
-JP3                     PINHD-2X20 2X20                   1
-JP4                     PINHD-2X20 2X20                   1
+CON1     FLIPCHIP_1     FLIPCHIP-PCB-CONNECTOR 1
+CON2     FLIPCHIP_1     FLIPCHIP-PCB-CONNECTOR 1
+JP1                     2X20                   1
+JP2                     2X20                   1
+JP3                     2X20                   1
+JP4                     2X20                   1
