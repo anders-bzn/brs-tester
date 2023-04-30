@@ -9,8 +9,9 @@ struct config {
 	float	load_high_margin;
 	float	load_current;
 	float	load_current_margin;
-	float	logic_input_current;
-	float	logic_input_current_margin;
+	float	input_current;
+	float	input_current_margin;
+	int	input_active_level;
 	float	logic_high;
 };
 

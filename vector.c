@@ -14,7 +14,7 @@ enum check_format {
 static int validate_format(char *str, enum check_format format)
 {
 	/*
-	 * Check string for correct length, expecty a traling "'"
+	 * Check string for correct length, expect a traling "'"
 	 */
 	if (VECTOR_LENGTH + 1 != strlen(str)) {
 		return -1;
@@ -94,7 +94,6 @@ int vector_loadVectors(char *filename, struct config *board)
 
 	int k=0, i=0;
 	while (!feof(fp)) {
-
 		fgets(str, 100, fp);
 		i++;
 
@@ -127,7 +126,7 @@ int vector_loadVectors(char *filename, struct config *board)
 			vectors[k][VECTOR_LENGTH-1] = '\0';
 			k++;
 			vectors[k] = NULL;
-		} else if (0 == strncmp("load-low='",str, sizeof("load-low='")-1)) {
+		} else if (0 == strncmp("load-low='", str, sizeof("load-low='")-1)) {
 			float value = 0;
 			int k = sscanf(str, "load-low='%fmV'", &value);
 			if (k == 1) {
@@ -136,7 +135,7 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		}  else if (0 == strncmp("load-low-margin='",str, sizeof("load-low-margin='")-1)) {
+		} else if (0 == strncmp("load-low-margin='", str, sizeof("load-low-margin='")-1)) {
 			float value = 0;
 			int k = sscanf(str, "load-low-margin='%fmV'", &value);
 			if (k == 1) {
@@ -145,7 +144,7 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		} else if (0 == strncmp("load-high='",str, sizeof("load-high='")-1)) {
+		} else if (0 == strncmp("load-high='", str, sizeof("load-high='")-1)) {
 			float value = 0;
 			int k = sscanf(str, "load-high='%fmV'", &value);
 			if (k == 1) {
@@ -154,7 +153,7 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		}  else if (0 == strncmp("load-high-margin='",str, sizeof("load-high-margin='")-1)) {
+		} else if (0 == strncmp("load-high-margin='", str, sizeof("load-high-margin='")-1)) {
 			float value = 0;
 			int k = sscanf(str, "load-high-margin='%fmV'", &value);
 			if (k == 1) {
@@ -163,7 +162,7 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		} else if (0 == strncmp("load-current='",str, sizeof("load-current='")-1)) {
+		} else if (0 == strncmp("load-current='", str, sizeof("load-current='")-1)) {
 			float value = 0;
 			int k = sscanf(str, "load-current='%fmA'", &value);
 			if (k == 1) {
@@ -172,7 +171,7 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		}  else if (0 == strncmp("load-current-margin='",str, sizeof("load-current-margin='")-1)) {
+		} else if (0 == strncmp("load-current-margin='", str, sizeof("load-current-margin='")-1)) {
 			float value = 0;
 			int k = sscanf(str, "load-current-margin='%fmA'", &value);
 			if (k == 1) {
@@ -181,25 +180,25 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		} else if (0 == strncmp("logic-input-current='",str, sizeof("logic-input-current='")-1)) {
+		} else if (0 == strncmp("input-current='", str, sizeof("input-current='")-1)) {
 			float value = 0;
-			int k = sscanf(str, "logic-input-current='%fmA'", &value);
+			int k = sscanf(str, "input-current='%fmA'", &value);
 			if (k == 1) {
-				board->logic_input_current = value;
+				board->input_current = value;
 			} else {
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		}  else if (0 == strncmp("logic-input-current-margin='",str, sizeof("logic-input-current-margin='")-1)) {
+		} else if (0 == strncmp("input-current-margin='", str, sizeof("input-current-margin='")-1)) {
 			float value = 0;
-			int k = sscanf(str, "logic-input-current-margin='%fmA'", &value);
+			int k = sscanf(str, "input-current-margin='%fmA'", &value);
 			if (k == 1) {
-				board->logic_input_current_margin = value;
+				board->input_current_margin = value;
 			} else {
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		} else if (0 == strncmp("logic-high='",str, sizeof("logic-high='")-1)) {
+		} else if (0 == strncmp("logic-high='", str, sizeof("logic-high='")-1)) {
 			float value = 0;
 			int k = sscanf(str, "logic-high='%fmV'", &value);
 			if (k == 1) {
@@ -208,7 +207,7 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		} else if (0 == strncmp("output-drive-strenght='",str, sizeof("output-drive-strenght='")-1)) {
+		} else if (0 == strncmp("output-drive-strenght='", str, sizeof("output-drive-strenght='")-1)) {
 			int k, current = 0;
 			k = sscanf(str, "output-drive-strenght='%dmA'", &current);
 			if (k == 1 && current >= 0 && current < 127) {
@@ -217,6 +216,10 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
+		} else if (0 == strcmp("input-active-level='high'\n", str)) {
+			board->input_active_level = 0;
+		} else if (0 == strcmp("input-active-level='low'\n", str)) {
+			board->input_active_level = 1;
 		} else {
 			printf("ERROR: Error parse file line %d: %s\n", i, str);
 			return -1;
@@ -258,8 +261,9 @@ struct config *vector_allocConfig(void)
 	b_cfg->load_high_margin = 0;
 	b_cfg->load_current = 0;
 	b_cfg->load_current_margin = 0;
-	b_cfg->logic_input_current = 0;
-	b_cfg->logic_input_current_margin = 0;
+	b_cfg->input_current = 0;
+	b_cfg->input_current_margin = 0;
+	b_cfg->input_active_level = 0;
 	b_cfg->logic_high = 0;
 	return b_cfg;
 }

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ugpio/ugpio.h>
 #include <errno.h>
 #include "hal.h"
@@ -936,8 +937,8 @@ int pin_getFunction(enum fc_pin pin, enum pinFunction *function)
 
 
 /*
- * Connect a pin to the measeurement circuitry. There is no check if more
- * then one pin is enabled at the same time so be careful.
+ * Connect a pin to the measurement circuitry. There is no check if more
+ * than one pin is enabled at the same time so be careful.
  */
 int pin_setMeasure(enum fc_pin pin, int enable)
 {
@@ -1140,4 +1141,20 @@ int pin_getName(enum fc_pin pin, char **str)
 
 	*str = (char *)pinSettings[pin].name;
 	return 0;
+}
+
+
+/*
+ * Get pin index from name.
+ */
+enum fc_pin pin_getIndex(char *str)
+{
+	enum fc_pin pin=-1;
+	for (enum fc_pin i=0; i<LAST_PIN; i++){
+		if(0 == strcmp((char *)pinSettings[i].name, str)){
+			pin=i;
+			break;
+		}
+	}
+	return pin;
 }

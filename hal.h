@@ -70,3 +70,4 @@ int pin_toggleData(enum fc_pin pin, int toggles);
 int pin_setGnd(enum fc_pin pin, int data);
 int pin_getValue(enum fc_pin pin, int *val);
 int pin_getName(enum fc_pin pin, char **str);
+enum fc_pin pin_getIndex(char *str);

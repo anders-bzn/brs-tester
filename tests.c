@@ -197,7 +197,7 @@ int tests_setupBoard(struct config const *b_cfg)
 			return -1;
 		}
 	}
-	printf("\n");
+	printf("\n\n");
 	return 0;
 }
 
@@ -231,7 +231,7 @@ int tests_checkVoltages(struct config const *b_cfg)
 		case 'p':
 		case 'g':
 		case 'i':
-			printf("PIN: %s %c\n", pinName, str[pin]);
+			printf("Pin: %s %c\n", pinName, str[pin]);
 			break;
 		case 'o':
 		case 'O':
@@ -256,7 +256,7 @@ int tests_checkVoltages(struct config const *b_cfg)
 				retVal = -1;
 			}
 
-			printf("PIN: %s %c voltage %7.1f [ %s ]\n", pinName, str[pin], voltage, voltage_ok ? " OK " : "FAIL");
+			printf("Pin: %s %c voltage %7.1f                 [ %s ]\n", pinName, str[pin], voltage, voltage_ok ? " OK " : "FAIL");
 			break;
 		default:
 			printf("ERROR: Format error\n");
@@ -330,7 +330,7 @@ int tests_checkPullDown(struct config const *b_cfg)
 				current_ok = 1;
 			}
 
-			printf("PIN: %s %c voltage %7.1f %7.1f %7.1f [ %s ]\n", pinName, str[pin], voltage_l, voltage_h, current, (voltage_ok && current_ok) ? " OK " : "FAIL");
+			printf("Pin: %s %c voltage %7.1f %7.1f %7.1f [ %s ]\n", pinName, str[pin], voltage_l, voltage_h, current, (voltage_ok && current_ok) ? " OK " : "FAIL");
 			break;
 		default:
 			printf("ERROR: Format error\n");
@@ -368,7 +368,6 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
 		case 'O':
 			printf("%c", vector[pin]);
 			break;
-
 		case 'i':
 			/*
 			 * Set output
@@ -413,6 +412,66 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
 		}
 	}
 	printf("\n");
+	return 0;
+}
 
+
+/*
+ * This function will loop over all inputs and verify that they don't
+ * draw to much current on the input pins.
+ */
+int tests_checkInputs(struct config const *b_cfg)
+{
+	char const *setup = b_cfg->pin_def;
+
+	/* Setup string can look x	like this:
+	 * pppiodiodiodiodiod------------------
+	 *
+	 * 'i' - input pin on testet board
+	 *
+	 * Just care about the inputs.
+	 */
+
+	for (int pin = AA; pin < LAST_PIN; pin++) {
+		if (setup[pin] == 'i') {
+			// Set inactive level on all inputs
+			pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
+		}
+	}
+
+	for (int pin = AA; pin < LAST_PIN; pin++) {
+		if (setup[pin] == 'i') {
+			float current, voltage, voltage_margin;
+			int result = 1;
+
+			char *str;
+			pin_getName(pin, &str);
+			voltage_margin = b_cfg->input_active_level ? -3700 : b_cfg->logic_high;
+			pin_setMeasure(pin, 1);
+			pin_setDataOut(pin, b_cfg->input_active_level ? 1 : 0);
+			usleep(200000);
+			hal_measureCurrent(&current);
+			hal_measureVoltage(&voltage);
+
+			if ((fabs(voltage - voltage_margin) > 100) ||
+			    (fabs(current - b_cfg->input_current) > b_cfg->input_current_margin)){
+				result = 0;
+			}
+			printf("Pin: %s H voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
+			pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
+			usleep(100000);
+			hal_measureCurrent(&current);
+			hal_measureVoltage(&voltage);
+
+			voltage_margin = b_cfg->input_active_level ? b_cfg->logic_high : -3700;
+			if ((fabs(voltage - voltage_margin) > 100) || (current < -0.1)){
+				result = 0;
+			}
+			printf("Pin: %s H voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
+			pin_setMeasure(pin, 0);
+			pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
+		}
+	}
+	printf("\n");
 	return 0;
 }

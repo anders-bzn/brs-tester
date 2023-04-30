@@ -6,3 +6,4 @@ int tests_setupBoard(struct config const *b_cfg);
 int tests_checkVoltages(struct config const *b_cfg);
 int tests_checkPullDown(struct config const *b_cfg);
 int tests_checkLogic(struct config const *b_cfg, char *vector);
+int tests_checkInputs(struct config const *b_cfg);

@@ -45,6 +45,7 @@ int main (int argc, char *argv[])
 			hal_setDefault();
 			hal_powerEnable(0);
 			hal_teardown();
+			return 0;
 		}
 
 		if ( 0 == strcmp("--selftest", argv[1])){
@@ -65,11 +66,11 @@ int main (int argc, char *argv[])
 
 	int i = 0;
 	while (i < argc){
-		if ( 0 == strcmp("--help", argv[i])){
+		if (0 == strcmp("--help", argv[i])){
 			print_usage(argv[0]);
 		}
 
-		if ( 0 == strcmp("--power-enable=on", argv[i]) && argc == 2){
+		if (0 == strcmp("--power-enable=on", argv[i]) && argc == 2){
 			/*
 			 * Power on
 			 */
@@ -83,7 +84,7 @@ int main (int argc, char *argv[])
 			return 0;
 		}
 
-		if ( 0 == strcmp("--power-enable=off", argv[i]) && argc == 2){
+		if (0 == strcmp("--power-enable=off", argv[i]) && argc == 2){
 			/*
 			 * Power off
 			 */
@@ -97,17 +98,26 @@ int main (int argc, char *argv[])
 			return 0;
 		}
 
-		if ( 0 == strcmp("--toggle>", argv[i])){
-			// Set one pin, an toggle it number of loops!
-			// Test to measure the speed
+		if (0 == strncmp("--toggle=", argv[i], sizeof("--toggle=")-1)){
+			enum fc_pin pin;
+			char *str = &argv[i][sizeof("--toggle=")-1];
+
+			pin = pin_getIndex(str);
+
+			if (pin == -1 || pin == 0 || pin == 1 || pin == 2 ||
+			    pin == 18 || pin == 19 || pin == 20){
+				    printf("ERROR: Invalid pin: %s\n",str);
+			}
+
+			printf("Toggle %d %s\n", pin_getIndex(str), str);
 			hal_setDefault();
-			pin_setFunction(AE, PIN_OUTPUT);
-			pin_setMeasure(AE, 1);
-			pin_toggleData(AE, loops);
+			pin_setFunction(pin, PIN_OUTPUT);
+			pin_setMeasure(pin, 1);
+			pin_toggleData(pin, loops);
 		}
 
-		if (( 0 == strcmp("--loop", argv[i]) && (argc - 1) > i) ||
-		    ( 0 == strcmp("-l", argv[i]) && (argc - 1) > i)){
+		if ((0 == strcmp("--loop", argv[i]) && (argc - 1) > i) ||
+		    (0 == strcmp("-l", argv[i]) && (argc - 1) > i)){
 			if (sscanf(argv[i+1], "%d", &loops) != 1){
 				if (hal_setup() < 0) {
 					printf("ERROR: hal_setup() failed\n");
@@ -119,8 +129,8 @@ int main (int argc, char *argv[])
 			}
 		}
 
-		if (( 0 == strcmp("-b", argv[i]) && (argc - 1) > i) ||
-		    ( 0 == strcmp("--board", argv[i]) && (argc - 1) > i)){
+		if ((0 == strcmp("-b", argv[i]) && (argc - 1) > i) ||
+		    (0 == strcmp("--board", argv[i]) && (argc - 1) > i)){
 			struct config *board_config = vector_allocConfig();
 			if (0 > vector_loadVectors(argv[i+1], board_config)) {
 				vector_freeVectors();
@@ -136,6 +146,7 @@ int main (int argc, char *argv[])
 			hal_powerEnable(1);
 			usleep(1000000);
 
+			printf("TEST: Check voltages\n");
 			if (0 > tests_checkVoltages(board_config)) {
 				printf("ERROR: Execution halted due to voltage outside limits\n");
 				hal_powerEnable(0);
@@ -146,9 +157,14 @@ int main (int argc, char *argv[])
 				return -1;
 			}
 
+			printf("TEST: Setup board\n");
 			tests_setupBoard(board_config);
+			printf("TEST: Check pull downs\n");
 			tests_checkPullDown(board_config);
+			printf("TEST: Check inputs\n");
+			tests_checkInputs(board_config);
 
+			printf("TEST: Check logic\n");
 			int l=0;
 			while (l < loops) {
 				int k=0;
@@ -176,7 +192,7 @@ int main (int argc, char *argv[])
  TODO: list of things to implement
  ---------------------------------
  [ ] Test input current
- [ ] Test output drive strengt
+ [ ] Test output drive strength
  [x] Loop testing
  [x] Free testvectors
  [ ] What and where should result be printed
@@ -187,7 +203,7 @@ int main (int argc, char *argv[])
  [x] Let Makefile install everything?
  [ ] Parse first, then execute
  [x] udev does not run the script. Absoulte path?
- [ ] Break on failures
+ [x] Break on failures
  [x] Load and verify vectors in own file
  [x] Clean up hal.c (return when error, handle errors)
 
