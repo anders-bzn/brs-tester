@@ -186,25 +186,3 @@ int main (int argc, char *argv[])
 
 	return 0;
 }
-
-/*
-
- TODO: list of things to implement
- ---------------------------------
- [ ] Test input current
- [ ] Test output drive strength
- [x] Loop testing
- [x] Free testvectors
- [ ] What and where should result be printed
- [x] udev rule to initiate board and export gpios
- [ ] Single step testing
- [x] Validate test vectors more (validate characters)
- [x] Move out test functions to own file
- [x] Let Makefile install everything?
- [ ] Parse first, then execute
- [x] udev does not run the script. Absoulte path?
- [x] Break on failures
- [x] Load and verify vectors in own file
- [x] Clean up hal.c (return when error, handle errors)
-
-*/
