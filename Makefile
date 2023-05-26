@@ -12,6 +12,9 @@ RULES=99-brs_tester-init.rules
 all: $(CFILES) $(HFILES) Makefile
 	$(CC) $(CFILES) -o $(BIN) $(CFLAGS) -L/usr/local/lib -l$(LIBS) -Wl,-rpath=/usr/local/lib
 
+host: $(CFILES) $(HFILES) Makefile
+	$(CC) -D __HOST $(CFILES) -o $(BIN) $(CFLAGS)
+
 install: all
 	install -m 0755 $(BIN) $(BIN_DIR)
 	install -m 0755 $(INIT) $(BIN_DIR)

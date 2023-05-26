@@ -2,14 +2,37 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef __HOST
 #include <ugpio/ugpio.h>
+#else
+#include "ugpio_stubs.h"
+#endif
 #include <errno.h>
 #include "hal.h"
 
 /*
+ * Filenames
+ */
+#ifndef __HOST
+#define FILE_VOLTAGE0_RAW 	"/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
+#define FILE_VOLTAGE0_SCALE	"/sys/bus/iio/devices/iio:device0/in_voltage0_scale"
+#define FILE_VOLTAGE1_RAW	"/sys/bus/iio/devices/iio:device0/in_voltage1_raw"
+#define FILE_VOLTAGE1_SCALE	"/sys/bus/iio/devices/iio:device0/in_voltage1_scale"
+#define FILE_VOLTAGE3_RAW	"/sys/bus/iio/devices/iio:device0/in_voltage3_raw"
+#define FILE_VOLTAGE3_SCALE 	"/sys/bus/iio/devices/iio:device0/in_voltage3_scale"
+#else
+#define FILE_VOLTAGE0_RAW 	"/dev/null"
+#define FILE_VOLTAGE0_SCALE	"/dev/null"
+#define FILE_VOLTAGE1_RAW	"/dev/null"
+#define FILE_VOLTAGE1_SCALE	"/dev/null"
+#define FILE_VOLTAGE3_RAW	"/dev/null"
+#define FILE_VOLTAGE3_SCALE 	"/dev/null"
+#endif
+
+
+/*
  * Definitions for GPIO's
  */
-
 enum gpio_list {
 	GPIO_ENABLE_POWER = 0,
 	GPIO_SELECT_OUT   = 1,
@@ -554,10 +577,10 @@ int hal_measureCurrent(float *iMeas){
 	float uRaw_voltage = 0;
 	int c;
 
-	FILE *fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage3_raw", "r");
+	FILE *fp = fopen(FILE_VOLTAGE3_RAW, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage3_raw");
+		printf("ERROR: %s\n", FILE_VOLTAGE3_RAW);
 		return -1;
 	}
 
@@ -568,10 +591,10 @@ int hal_measureCurrent(float *iMeas){
 		return -1;
 	}
 
-	fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage3_scale", "r");
+	fp = fopen(FILE_VOLTAGE3_SCALE, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage3_scale");
+		printf("ERROR: %s\n", FILE_VOLTAGE3_SCALE);
 		return -1;
 	}
 
@@ -582,10 +605,10 @@ int hal_measureCurrent(float *iMeas){
 		return -1;
 	}
 
-	fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage0_raw", "r");
+	fp = fopen(FILE_VOLTAGE0_RAW, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage0_raw");
+		printf("ERROR: %s\n", FILE_VOLTAGE0_RAW);
 		return -1;
 	}
 
@@ -596,10 +619,10 @@ int hal_measureCurrent(float *iMeas){
 		return -1;
 	}
 
-	fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage0_scale", "r");
+	fp = fopen(FILE_VOLTAGE0_SCALE, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage0_scale");
+		printf("ERROR: %s\n", FILE_VOLTAGE0_SCALE);
 		return -1;
 	}
 
@@ -627,10 +650,10 @@ int hal_measureVoltage(float *uMeas){
 	float uRaw_voltage = 0;
 	int c;
 
-	FILE *fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage3_raw", "r");
+	FILE *fp = fopen(FILE_VOLTAGE3_RAW, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage3_raw");
+		printf("ERROR: %s\n", FILE_VOLTAGE3_RAW);
 		return -1;
 	}
 
@@ -641,10 +664,10 @@ int hal_measureVoltage(float *uMeas){
 		return -1;
 	}
 
-	fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage3_scale", "r");
+	fp = fopen(FILE_VOLTAGE3_SCALE, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage3_scale");
+		printf("ERROR: %s\n", FILE_VOLTAGE3_SCALE);
 		return -1;
 	}
 
@@ -655,10 +678,10 @@ int hal_measureVoltage(float *uMeas){
 		return -1;
 	}
 
-	fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage1_raw", "r");
+	fp = fopen(FILE_VOLTAGE1_RAW, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage1_raw");
+		printf("ERROR: %s\n", FILE_VOLTAGE1_RAW);
 		return -1;
 	}
 
@@ -669,10 +692,10 @@ int hal_measureVoltage(float *uMeas){
 		return -1;
 	}
 
-	fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage1_scale", "r");
+	fp = fopen(FILE_VOLTAGE1_SCALE, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage1_scale");
+		printf("ERROR: %s\n", FILE_VOLTAGE1_SCALE);
 		return -1;
 	}
 
@@ -702,10 +725,10 @@ int hal_measureVoltageRef(float *uMeas){
 	float uRef_voltage = 0;
 	int c;
 
-	FILE *fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage3_raw", "r");
+	FILE *fp = fopen(FILE_VOLTAGE3_RAW, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage3_raw");
+		printf("ERROR: %s\n", FILE_VOLTAGE3_RAW);
 		return -1;
 	}
 
@@ -716,10 +739,10 @@ int hal_measureVoltageRef(float *uMeas){
 		return -1;
 	}
 
-	fp = fopen("/sys/bus/iio/devices/iio:device0/in_voltage3_scale", "r");
+	fp = fopen(FILE_VOLTAGE3_SCALE, "r");
 
 	if (fp == NULL) {
-		printf("ERROR: %s\n", "/sys/bus/iio/devices/iio:device0/in_voltage3_scale");
+		printf("ERROR: %s\n", FILE_VOLTAGE3_SCALE);
 		return -1;
 	}
 
