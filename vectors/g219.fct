@@ -1,0 +1,34 @@
+# Test for G219, memory selector. Add-on board is needed, manual test
+# procedure. Measure one driver at a time with oscilloscope, 
+#
+# Out: AF/AH
+# In: AD/AS/AU/AV
+#
+# Out: AL/AM
+# In: AE/AS/AU/AV
+#
+# Out: AP/AN
+# In: AE/AT/AU/AV
+#
+# Out: AK/AJ
+# In: AD/AT/AU/AV
+#
+# All '1''s on inputs gives active out.
+# 
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppii---------iiiipppii---------iiii'
+vector='---10---------101T---00---------0000'
+vector='---01---------101T---00---------0000'
+vector='---01---------01T1---00---------0000'
+vector='---10---------10T1---00---------0000'
+vector='---00---------0000---10---------101T'
+vector='---00---------0000---01---------101T'
+vector='---00---------0000---01---------01T1'
+vector='---00---------0000---10---------10T1'
+
+input-current='-2.5mA'
+input-current-margin='0.2mA'
+input-active-level='high'
+input-logic-high='-110mV'
+toggles='123456'
