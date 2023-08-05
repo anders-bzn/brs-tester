@@ -12,7 +12,8 @@ struct config {
 	float	input_current;
 	float	input_current_margin;
 	int	input_active_level;
-	float	logic_high;
+	float	input_logic_high;
+	int	toggles;
 };
 
 extern char *vectors[];

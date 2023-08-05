@@ -122,7 +122,7 @@ int tests_selfTest(void)
 
 /*
  * Must add:
- * Electrical test of in/outputs
+ * Electrical test of outputs
  *
  */
 
@@ -149,6 +149,7 @@ int tests_setupBoard(struct config const *b_cfg)
 			printf("p");
 			break;
 		case '-':
+			printf("-");
 			break;
 		case 'i':
 			/*
@@ -358,7 +359,7 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
 	 * '-' - pin should not be used
 	 */
 
-	for (int pin = AA; pin < LAST_PIN; pin ++) {
+	for (int pin = AA; pin < LAST_PIN; pin++) {
 		switch (setup[pin]) {
 		case 'p':
 		case 'g':
@@ -372,7 +373,11 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
 			/*
 			 * Set output
 			 */
-			pin_setDataOut(pin, vector[pin] - '0');
+			if (vector[pin] == 'T') {	
+				pin_setDataOut(pin, 0);
+			} else {
+				pin_setDataOut(pin, vector[pin] - '0');
+			}
 			printf("%c", vector[pin]);
 			break;
 		default:
@@ -381,6 +386,18 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
 		}
 	}
 	printf("\n");
+
+	// Check for toggling pin
+	for (int pin = AA; pin < LAST_PIN; pin ++) {
+		char *pinName;
+
+		pin_getName(pin, &pinName);
+		if (setup[pin] == 'i' && vector[pin] == 'T') {
+			pin_toggleData(pin, b_cfg->toggles);
+			printf("Toogle pin %s %d times\n", pinName, b_cfg->toggles);
+		}
+	}
+
 
 	for (int pin = AA; pin < LAST_PIN; pin ++) {
 		int data_in;
@@ -446,7 +463,7 @@ int tests_checkInputs(struct config const *b_cfg)
 
 			char *str;
 			pin_getName(pin, &str);
-			voltage_margin = b_cfg->input_active_level ? -3700 : b_cfg->logic_high;
+			voltage_margin = b_cfg->input_active_level ? -3700 : b_cfg->input_logic_high;
 			pin_setMeasure(pin, 1);
 			pin_setDataOut(pin, b_cfg->input_active_level ? 1 : 0);
 			usleep(200000);
@@ -463,7 +480,7 @@ int tests_checkInputs(struct config const *b_cfg)
 			hal_measureCurrent(&current);
 			hal_measureVoltage(&voltage);
 
-			voltage_margin = b_cfg->input_active_level ? b_cfg->logic_high : -3700;
+			voltage_margin = b_cfg->input_active_level ? b_cfg->input_logic_high : -3700;
 			if ((fabs(voltage - voltage_margin) > 100) || (current < -0.1)){
 				result = 0;
 			}

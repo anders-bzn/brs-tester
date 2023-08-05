@@ -21,5 +21,5 @@ vector='---1-----1-10-1--1------------------'
 
 input-current='-1.8mA'
 input-current-margin='0.2mA'
-logic-high='-110mV'
+input-logic-high='-110mV'
 output-drive-strenght='26mA'

@@ -13,6 +13,7 @@ enum check_format {
 
 static int validate_format(char *str, enum check_format format)
 {
+	int numTogglePins = 0;
 	/*
 	 * Check string for correct length, expect a traling "'"
 	 */
@@ -20,15 +21,21 @@ static int validate_format(char *str, enum check_format format)
 		return -1;
 	}
 	/*
-	 * Check vector string. Only allow "-01". And only "-" on power
-	 * pin location.
+	 * Check vector string. Only allow "-01T". T for Toggle, and only "-" on power
+	 * pin location. Toggle one pin only.
 	 */
 	if (format == FORMAT_VECTOR){
 		for(int i=0; i < VECTOR_LENGTH - 1; i++){
 			switch (str[i]) {
 				case '0':
 				case '1':
+				case 'T':
 					if (i==0 || i==1 || i==2 || i==18 || i==19 || i==20) {
+						return -1;
+					}
+
+					if (str[i] == 'T' && ++numTogglePins > 1){
+						/* Can only toggle one pin at a time (currently). */
 						return -1;
 					}
 				case '-':
@@ -94,7 +101,8 @@ int vector_loadVectors(char *filename, struct config *board)
 
 	int k=0, i=0;
 	while (!feof(fp)) {
-		fgets(str, 100, fp);
+		if (!fgets(str, 100, fp))
+			break;
 		i++;
 
 		/*
@@ -198,11 +206,11 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		} else if (0 == strncmp("logic-high='", str, sizeof("logic-high='")-1)) {
+		} else if (0 == strncmp("input-logic-high='", str, sizeof("input-logic-high='")-1)) {
 			float value = 0;
-			int k = sscanf(str, "logic-high='%fmV'", &value);
+			int k = sscanf(str, "input-logic-high='%fmV'", &value);
 			if (k == 1) {
-				board->logic_high = value;
+				board->input_logic_high = value;
 			} else {
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
@@ -212,6 +220,15 @@ int vector_loadVectors(char *filename, struct config *board)
 			k = sscanf(str, "output-drive-strenght='%dmA'", &current);
 			if (k == 1 && current >= 0 && current < 127) {
 				board->output_drive_strenght = current;
+			} else {
+				printf("ERROR: Error parse file line %d: %s\n", i, str);
+				return -1;
+			}
+		} else if (0 == strncmp("toggles='", str, sizeof("toggles='")-1)) {
+			int k, toggles = 0;
+			k = sscanf(str, "toggles='%d'", &toggles);
+			if (k == 1) {
+				board->toggles = toggles;
 			} else {
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
@@ -264,6 +281,7 @@ struct config *vector_allocConfig(void)
 	b_cfg->input_current = 0;
 	b_cfg->input_current_margin = 0;
 	b_cfg->input_active_level = 0;
-	b_cfg->logic_high = 0;
+	b_cfg->input_logic_high = 0;
+	b_cfg->toggles = 0;
 	return b_cfg;
 }
