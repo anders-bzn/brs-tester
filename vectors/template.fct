@@ -1,0 +1,51 @@
+# This is the template file that descibes all keys that can be used in 
+# a test vector file.
+#
+# First, every line starting with a '#' will be treated as a comment line
+# Blank lines will also be skipped.
+
+# Those two folowing lines are just helpers to make it easier to configure the right pin.
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+
+# The 'config' key describes how the tested board has it connections. 
+# 
+# 'p' - power pin, do nothing
+# 'i' - input pin on testet board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+config='pppiiOdiiOdiiOdiiO------------------'
+
+# There can be multiple 'vector' keys. They are processed in order from top to bottom in the file. 
+# If pin is configured to input, '01T' are valid configuration. 'T' toggles one pin only (one T per row) 
+# and it's purpose is for debugging and half manual tests. 
+# If the pin is configured as output, the pin value will be checked against
+# the given value (only '0' and '1' is valid) after all inputs has been set.
+vector='---10---------101T------------------'
+vector='---01---------101T------------------'
+vector='---01---------01T1------------------'
+vector='---10---------10T1------------------'
+
+# load-* keys are used to define limit values for tests of load networks
+# present on some boards. Used when the 'd' operator is found in the config string. 
+load-low='-3700mV'
+load-low-margin='200mV'
+load-high='-50mV'
+load-high-margin='100mV'
+load-current='-10mA'
+load-current-margin='1mA'
+
+# input-* keys defined limits when testing inputs
+input-current='-1.8mA'
+input-current-margin='0.2mA'
+input-active-level='high'
+input-logic-high='-110mV'
+
+# output-drives-strenth defines how much current the outputs can sink  
+output-drive-strenght='26mA'
+
+# Number of time a pin should toggle when the 'T' function is used in the vector string.
+toggles='1000'
