@@ -41,7 +41,7 @@ in a known state.
 TBD
 
 ## Test vectors
-TBD
+There is a template file in the "vectors" folder that tries to explain how it works.
 
 ## Setting up the Raspberry Pi
 In /boot/config.txt
