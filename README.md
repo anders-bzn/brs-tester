@@ -62,13 +62,23 @@ dtparam=chc_enable
 dtparam=chd_enable
 ```
 
+If you want a serial console connected to the pin header on the back:
+
+```
+enable_uart=1
+```
+
+The default speed is 115200 baud, if you want something else, change /boot/cmdline.txt
+
+
 Install libugpio:
 
 ```
 git clone https://github.com/mhei/libugpio.git
 sudo apt install autoconf
 sudo apt install libtool
-./autoconf.sh
+cd libugpio
+./autogen.sh
 ./configure
 make
 sudo make install
