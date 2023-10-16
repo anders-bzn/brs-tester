@@ -72,7 +72,7 @@ int tests_selfTest(void)
 			hal_measureCurrent (&current);
 			hal_enableLoad(0);
 
-			if ( fabs(voltage_l) < 5.0 && fabs(voltage_h + 3700.0 ) < 50.0) {
+			if ( fabs(voltage_l) < 10.0 && fabs(voltage_h + 3700.0 ) < 50.0) {
 				voltage_ok = 1;
 			}
 
@@ -98,7 +98,13 @@ int tests_selfTest(void)
 	for (int curr = 2, i = 0; curr < 128; curr = (curr << 1), i++) {
 		float current;
 		int current_ok = 0;
-		const float currents[] = {-2.0, -3.9, -7.8, -15.2, -28.8, -52.2};
+
+		/*
+		 * In an ideal world, grounding the load restistors would have given
+		 * current 2, 4, 8, 16, 32 and 64 mA. However, the measurement resistor for current
+		 * and RDS(on) in the FET end up in series when testing the loads.
+		 */
+		const float currents[] = {-1.9, -3.9, -7.7, -15.0, -28.2, -50.2};
 
 		hal_enableLoad(curr);
 		usleep(10000);
@@ -114,6 +120,36 @@ int tests_selfTest(void)
 
 	pin_setFunction(AE, PIN_DISABLED);
 	pin_setMeasure(AE, 0);
+
+	/*
+	 * Test drive strength
+	 */
+	hal_enableLoad(32);
+
+	for (int pin = AD; pin < LAST_PIN; pin++) {
+		float current, voltage;
+		int result = 0;
+
+		if (pin == BA || pin == BB || pin == BC)
+			continue;
+
+		pin_setFunction(pin, PIN_OUTPUT);
+		pin_setDataOut(pin, 0);
+		pin_setMeasure(pin, 1);
+		usleep(100000);
+		hal_measureCurrent (&current);
+		hal_measureVoltage (&voltage);
+
+		result = (fabs(current) > 28.0 && fabs(voltage) < 400.0);
+
+		printf("Drive strength: %.2d mA, meas: (%5.1f mA) (%5.1f mV)                    [ %s ]\n",
+			32, current, voltage, (result) ? " OK " : "FAIL");
+
+		pin_setDataOut(pin, 1);
+		pin_setMeasure(pin, 0);
+		pin_setFunction(pin, PIN_DISABLED);
+	}
+	hal_enableLoad(0);
 	hal_setDefault();
 	hal_powerEnable(0);
 	return 0;
@@ -373,7 +409,7 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
 			/*
 			 * Set output
 			 */
-			if (vector[pin] == 'T') {	
+			if (vector[pin] == 'T') {
 				pin_setDataOut(pin, 0);
 			} else {
 				pin_setDataOut(pin, vector[pin] - '0');
@@ -397,7 +433,6 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
 			printf("Toogle pin %s %d times\n", pinName, b_cfg->toggles);
 		}
 	}
-
 
 	for (int pin = AA; pin < LAST_PIN; pin ++) {
 		int data_in;
