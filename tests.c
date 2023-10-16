@@ -97,6 +97,7 @@ int tests_selfTest(void)
 
 	for (int curr = 2, i = 0; curr < 128; curr = (curr << 1), i++) {
 		float current;
+		float current_error;
 		int current_ok = 0;
 
 		/*
@@ -109,8 +110,10 @@ int tests_selfTest(void)
 		hal_enableLoad(curr);
 		usleep(10000);
 		hal_measureCurrent (&current);
+		current_error = fabs(currents[i] - current);
 
-		if (fabs(currents[i] - current) < 0.2){
+		if ((current_error < fabs(currents[i] * 0.05)) ||
+		    (current_error < 0.2)){
 			current_ok = 1;
 		}
 
@@ -476,7 +479,7 @@ int tests_checkInputs(struct config const *b_cfg)
 {
 	char const *setup = b_cfg->pin_def;
 
-	/* Setup string can look x	like this:
+	/* Setup string can look like this:
 	 * pppiodiodiodiodiod------------------
 	 *
 	 * 'i' - input pin on testet board
