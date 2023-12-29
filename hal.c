@@ -2,33 +2,26 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef __HOST
-#include <ugpio/ugpio.h>
-#else
-#include "ugpio_stubs.h"
-#endif
+#include <gpiod.h>
 #include <errno.h>
+
 #include "hal.h"
 
 /*
  * Filenames
  */
-#ifndef __HOST
-#define FILE_VOLTAGE0_RAW 	"/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
+#define FILE_VOLTAGE0_RAW	"/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
 #define FILE_VOLTAGE0_SCALE	"/sys/bus/iio/devices/iio:device0/in_voltage0_scale"
 #define FILE_VOLTAGE1_RAW	"/sys/bus/iio/devices/iio:device0/in_voltage1_raw"
 #define FILE_VOLTAGE1_SCALE	"/sys/bus/iio/devices/iio:device0/in_voltage1_scale"
 #define FILE_VOLTAGE3_RAW	"/sys/bus/iio/devices/iio:device0/in_voltage3_raw"
-#define FILE_VOLTAGE3_SCALE 	"/sys/bus/iio/devices/iio:device0/in_voltage3_scale"
-#else
-#define FILE_VOLTAGE0_RAW 	"/dev/null"
-#define FILE_VOLTAGE0_SCALE	"/dev/null"
-#define FILE_VOLTAGE1_RAW	"/dev/null"
-#define FILE_VOLTAGE1_SCALE	"/dev/null"
-#define FILE_VOLTAGE3_RAW	"/dev/null"
-#define FILE_VOLTAGE3_SCALE 	"/dev/null"
-#endif
+#define FILE_VOLTAGE3_SCALE	"/sys/bus/iio/devices/iio:device0/in_voltage3_scale"
 
+#ifdef PI_V
+#define GPIOCHIP "/dev/gpiochip4"
+#else
+#define GPIOCHIP "/dev/gpiochip0"
+#endif
 
 /*
  * Definitions for GPIO's
@@ -59,10 +52,9 @@ enum gpio_list {
 
 
 struct gpio {
-	const int flags;
-	const char active_low;
+	const bool active_low;
 	const char num;
-	ugpio_t *io;
+	struct gpiod_line_request *io;
 };
 
 /*
@@ -70,102 +62,82 @@ struct gpio {
  * initial configuration to all pin numbers.
  */
 struct gpio GPIOS[] = {
-	[GPIO_ENABLE_POWER].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_ENABLE_POWER].active_low = 0,
 	[GPIO_ENABLE_POWER].num = 27,
 	[GPIO_ENABLE_POWER].io = NULL,
 
-	[GPIO_SELECT_OUT].flags = GPIOF_OUT_INIT_HIGH,
 	[GPIO_SELECT_OUT].active_low = 1,
 	[GPIO_SELECT_OUT].num = 24,
 	[GPIO_SELECT_OUT].io = NULL,
 
-	[GPIO_SELECT_A].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_SELECT_A].active_low = 0,
 	[GPIO_SELECT_A].num = 25,
 	[GPIO_SELECT_A].io = NULL,
 
-	[GPIO_SELECT_B].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_SELECT_B].active_low = 0,
 	[GPIO_SELECT_B].num = 8,
 	[GPIO_SELECT_B].io = NULL,
 
-	[GPIO_SELECT_C].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_SELECT_C].active_low = 0,
 	[GPIO_SELECT_C].num = 7,
 	[GPIO_SELECT_C].io = NULL,
 
-	[GPIO_SELECT_D].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_SELECT_D].active_low = 0,
 	[GPIO_SELECT_D].num = 1,
 	[GPIO_SELECT_D].io = NULL,
 
-	[GPIO_LATCH_INPUTS].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_LATCH_INPUTS].active_low = 0,
 	[GPIO_LATCH_INPUTS].num = 12,
 	[GPIO_LATCH_INPUTS].io = NULL,
 
-	[GPIO_INP_A_OE].flags = GPIOF_OUT_INIT_HIGH,
 	[GPIO_INP_A_OE].active_low = 1,
 	[GPIO_INP_A_OE].num = 23,
 	[GPIO_INP_A_OE].io = NULL,
 
-	[GPIO_INP_B_OE].flags = GPIOF_OUT_INIT_HIGH,
 	[GPIO_INP_B_OE].active_low = 1,
 	[GPIO_INP_B_OE].num = 0,
 	[GPIO_INP_B_OE].io = NULL,
 
-	[GPIO_INP_C_OE].flags = GPIOF_OUT_INIT_HIGH,
 	[GPIO_INP_C_OE].active_low = 1,
 	[GPIO_INP_C_OE].num = 4,
 	[GPIO_INP_C_OE].io = NULL,
 
-	[GPIO_INP_D_OE].flags = GPIOF_OUT_INIT_HIGH,
 	[GPIO_INP_D_OE].active_low = 1,
 	[GPIO_INP_D_OE].num = 10,
 	[GPIO_INP_D_OE].io = NULL,
 
-	[GPIO_D0].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_D0].active_low = 0,
 	[GPIO_D0].num = 5,
 	[GPIO_D0].io = NULL,
 
-	[GPIO_D1].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_D1].active_low = 0,
 	[GPIO_D1].num = 6,
 	[GPIO_D1].io = NULL,
 
-	[GPIO_D2].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_D2].active_low = 0,
 	[GPIO_D2].num = 13,
 	[GPIO_D2].io = NULL,
 
-	[GPIO_D3].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_D3].active_low = 0,
 	[GPIO_D3].num = 19,
 	[GPIO_D3].io = NULL,
 
-	[GPIO_D4].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_D4].active_low = 0,
 	[GPIO_D4].num = 26,
 	[GPIO_D4].io = NULL,
 
-	[GPIO_D5].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_D5].active_low = 0,
 	[GPIO_D5].num = 21,
 	[GPIO_D5].io = NULL,
 
-	[GPIO_D6].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_D6].active_low = 0,
 	[GPIO_D6].num = 20,
 	[GPIO_D6].io = NULL,
 
-	[GPIO_D7].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_D7].active_low = 0,
 	[GPIO_D7].num = 16,
 	[GPIO_D7].io = NULL,
 
-	[GPIO_ENABLE_AUX].flags = GPIOF_OUT_INIT_LOW,
 	[GPIO_ENABLE_AUX].active_low = 0,
 	[GPIO_ENABLE_AUX].num = 22,
 	[GPIO_ENABLE_AUX].io = NULL,
@@ -219,6 +191,11 @@ struct board {
 };
 
 /*
+ * gpio chio global reference
+ */
+static struct gpiod_chip *chip;
+
+/*
  * Total number of boards in the backplane. 15 levelshifters and one
  * board for loading outputs on tested flipchips
  */
@@ -242,11 +219,11 @@ struct pinSetting {
 };
 
 static const char *pinFunctionStr[] = {
-	[PIN_POWER]	= "POWER",
-	[PIN_GND]	= "GND",
-	[PIN_INPUT]	= "INPUT",
-	[PIN_OUTPUT]	= "OUTPUT",
-	[PIN_DISABLED]	= "DISABLED"
+	[PIN_POWER]     = "POWER",
+	[PIN_GND]       = "GND",
+	[PIN_INPUT]     = "INPUT",
+	[PIN_OUTPUT]    = "OUTPUT",
+	[PIN_DISABLED]  = "DISABLED"
 };
 
 
@@ -499,6 +476,91 @@ static struct pinSetting pinSettings[] = {
 */
 
 
+static struct gpiod_line_request *
+gpiod_get_output_line(struct gpiod_chip *chip,
+		      unsigned int offset,
+		      bool active_low)
+{
+	struct gpiod_line_request *request = NULL;
+	struct gpiod_line_settings *settings;
+	struct gpiod_line_config *line_cfg;
+	int ret;
+
+	if (!chip)
+		return NULL;
+
+	settings = gpiod_line_settings_new();
+	if (!settings)
+		return NULL;
+
+	gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_OUTPUT);
+	gpiod_line_settings_set_output_value(settings, GPIOD_LINE_VALUE_INACTIVE);
+	gpiod_line_settings_set_active_low(settings, active_low);
+
+	line_cfg = gpiod_line_config_new();
+	if (!line_cfg)
+		goto free_settings;
+
+	ret = gpiod_line_config_add_line_settings(line_cfg, &offset, 1,
+						  settings);
+	if (ret)
+		goto free_line_config;
+
+	request = gpiod_chip_request_lines(chip, NULL, line_cfg);
+
+free_line_config:
+	gpiod_line_config_free(line_cfg);
+
+free_settings:
+	gpiod_line_settings_free(settings);
+
+	return request;
+}
+
+
+static int
+gpiod_reconfigure(struct gpiod_line_request *request,
+		  unsigned int offset,
+		  enum gpiod_line_direction dir,
+		  bool active_low)
+{
+	struct gpiod_request_config *req_cfg = NULL;
+	struct gpiod_line_settings *settings;
+	struct gpiod_line_config *line_cfg;
+	int ret = -1;
+
+	settings = gpiod_line_settings_new();
+	if (!settings)
+		return -1;
+
+	gpiod_line_settings_set_direction(settings, dir);
+	if (dir == GPIOD_LINE_DIRECTION_OUTPUT) {
+		gpiod_line_settings_set_output_value(settings, GPIOD_LINE_VALUE_INACTIVE);
+	}
+	gpiod_line_settings_set_active_low(settings, active_low);
+
+	line_cfg = gpiod_line_config_new();
+	if (!line_cfg)
+		goto free_settings;
+
+	ret = gpiod_line_config_add_line_settings(line_cfg, &offset, 1,
+						  settings);
+	if (ret)
+		goto free_line_config;
+
+	ret = gpiod_line_request_reconfigure_lines(request, line_cfg);
+
+	gpiod_request_config_free(req_cfg);
+
+free_line_config:
+	gpiod_line_config_free(line_cfg);
+
+free_settings:
+	gpiod_line_settings_free(settings);
+	return ret;
+}
+
+
 /*
  * Clock out data to a board
  */
@@ -509,45 +571,81 @@ static int setOut(int channel, int data)
 		return -1;
 	}
 
-	// Set as output and active low for highest bit
+	/*
+	 * Set as output and active low for highest bit
+	 */
 	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
 		if (channel == LOAD_BOARD_ADR) {
-			// Load board has other pins as active low/high
-			if (i < GPIO_D6) {
-				if (ugpio_set_activelow(GPIOS[i].io, 1) < 0){
-					return -1;
-				}
-			} else {
-				if (ugpio_set_activelow(GPIOS[i].io, 0) < 0){
-					return -1;
-				}
+			/*
+			 * Load board has other pins as active low/high
+			 */
+			switch (i) {
+				case GPIO_D6:
+				case GPIO_D7:
+					/*
+					 * Set active high
+					 */
+					 gpiod_reconfigure(GPIOS[i].io, GPIOS[i].num, GPIOD_LINE_DIRECTION_OUTPUT, 0);
+					 break;
+				 default:
+					/*
+					 * Set active low
+					 */
+					 gpiod_reconfigure(GPIOS[i].io, GPIOS[i].num, GPIOD_LINE_DIRECTION_OUTPUT, 1);
+					 break;
 			}
 		} else {
-			if (i < GPIO_D4) {
-				if (ugpio_set_activelow(GPIOS[i].io, 0) < 0){
-					return -1;
-				}
-			} else {
-				if (ugpio_set_activelow(GPIOS[i].io, 1) < 0){
-					return -1;
-				}
+			switch (i) {
+				case GPIO_D4:
+				case GPIO_D5:
+				case GPIO_D6:
+				case GPIO_D7:
+					/*
+					 * Set active low
+					 */
+					 gpiod_reconfigure(GPIOS[i].io, GPIOS[i].num, GPIOD_LINE_DIRECTION_OUTPUT, 1);
+					 break;
+				 default:
+					/*
+					 * Set active high
+					 */
+					 gpiod_reconfigure(GPIOS[i].io, GPIOS[i].num, GPIOD_LINE_DIRECTION_OUTPUT, 0);
+					 break;
 			}
 		}
 	}
 
-
-	ugpio_set_value(GPIOS[GPIO_SELECT_A].io, channel & 1);
-	ugpio_set_value(GPIOS[GPIO_SELECT_B].io, (channel >> 1) & 1);
-	ugpio_set_value(GPIOS[GPIO_SELECT_C].io, (channel >> 2) & 1);
-	ugpio_set_value(GPIOS[GPIO_SELECT_D].io, (channel >> 3) & 1);
+	gpiod_line_request_set_value(GPIOS[GPIO_SELECT_A].io,
+				     GPIOS[GPIO_SELECT_A].num,
+				     (channel >> 0) & 1 ? GPIOD_LINE_VALUE_ACTIVE :
+				      GPIOD_LINE_VALUE_INACTIVE);
+	gpiod_line_request_set_value(GPIOS[GPIO_SELECT_B].io,
+				     GPIOS[GPIO_SELECT_B].num,
+				     (channel >> 1) & 1 ? GPIOD_LINE_VALUE_ACTIVE :
+				      GPIOD_LINE_VALUE_INACTIVE);
+	gpiod_line_request_set_value(GPIOS[GPIO_SELECT_C].io,
+				     GPIOS[GPIO_SELECT_C].num,
+				     (channel >> 2) & 1 ? GPIOD_LINE_VALUE_ACTIVE :
+				      GPIOD_LINE_VALUE_INACTIVE);
+	gpiod_line_request_set_value(GPIOS[GPIO_SELECT_D].io,
+				     GPIOS[GPIO_SELECT_D].num,
+				     (channel >> 3) & 1 ? GPIOD_LINE_VALUE_ACTIVE :
+				      GPIOD_LINE_VALUE_INACTIVE);
 
 	for (int i = 0; i <= 7; i++) {
-		ugpio_set_value(GPIOS[i + GPIO_D0].io, (data >> i) & 1);
+		gpiod_line_request_set_value(GPIOS[i + GPIO_D0].io,
+					     GPIOS[i + GPIO_D0].num,
+					     ((data >> i) & 1) ? GPIOD_LINE_VALUE_ACTIVE :
+					      GPIOD_LINE_VALUE_INACTIVE);
 	}
 
-	ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 1);
+	gpiod_line_request_set_value(GPIOS[GPIO_SELECT_OUT].io,
+				     GPIOS[GPIO_SELECT_OUT].num,
+				     GPIOD_LINE_VALUE_ACTIVE);
 	usleep(1);
-	ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 0);
+	gpiod_line_request_set_value(GPIOS[GPIO_SELECT_OUT].io,
+				     GPIOS[GPIO_SELECT_OUT].num,
+				     GPIOD_LINE_VALUE_INACTIVE);
 	return 0;
 }
 
@@ -556,7 +654,10 @@ static int setOut(int channel, int data)
  * Enable/disable power to the flipchip under test
  */
 int hal_powerEnable(int on) {
-	int ret = ugpio_set_value(GPIOS[GPIO_ENABLE_POWER].io, on);
+	int ret = gpiod_line_request_set_value(GPIOS[GPIO_ENABLE_POWER].io,
+					       GPIOS[GPIO_ENABLE_POWER].num,
+					       on ? GPIOD_LINE_VALUE_ACTIVE :
+						GPIOD_LINE_VALUE_INACTIVE);
 
 	if (ret < 0) {
 		printf("ERROR: Could not %s power\n",  on ? "enable" : "disable");
@@ -633,8 +734,10 @@ int hal_measureCurrent(float *iMeas){
 		return -1;
 	}
 
-	// R = 10 Ohms, the INA141 has a gain of 10. 1 V equals 10mA, 1mV equals 10uA
-	// Result is given in mA.
+	/*
+	 * R = 10 Ohms, the INA141 has a gain of 10. 1 V equals 10mA, 1mV equals 10uA
+	 * Result is given in mA.
+	 */
 	*iMeas = (((float)(150.0/12.0) * ((uRaw_scale * uRaw_voltage) - (uRef_scale * uRef_voltage))) + (uRaw_scale * uRaw_voltage))/100;
 	return 0;
 }
@@ -766,37 +869,51 @@ int hal_getInputs (int *data) {
 	int value=0;
 	int inputs=0;
 
-	ugpio_set_value(GPIOS[GPIO_LATCH_INPUTS].io, 1);
+	gpiod_line_request_set_value(GPIOS[GPIO_LATCH_INPUTS].io,
+				     GPIOS[GPIO_LATCH_INPUTS].num,
+				     GPIOD_LINE_VALUE_ACTIVE);
 	usleep(1);
-	ugpio_set_value(GPIOS[GPIO_LATCH_INPUTS].io, 0);
+	gpiod_line_request_set_value(GPIOS[GPIO_LATCH_INPUTS].io,
+				     GPIOS[GPIO_LATCH_INPUTS].num,
+				     GPIOD_LINE_VALUE_INACTIVE);
 
-	// Set as input and all as active high
+	/*
+	 * Set as input and all as active high
+	 */
 	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
-		ugpio_direction_input(GPIOS[i].io);
-		if (ugpio_set_activelow(GPIOS[i].io, 0) < 0){
-			return -1;
-		}
+		gpiod_reconfigure(GPIOS[i].io, GPIOS[i].num, GPIOD_LINE_DIRECTION_INPUT, 0);
 	}
 
 	for (int k=0; k <= (GPIO_INP_D_OE - GPIO_INP_A_OE); k++) {
-		// Enable latch output
-		ugpio_set_value(GPIOS[GPIO_INP_A_OE+k].io, 1);
+		/*
+		 * Enable latch output
+		 */
+		gpiod_line_request_set_value(GPIOS[GPIO_INP_A_OE+k].io,
+					     GPIOS[GPIO_INP_A_OE+k].num,
+					     GPIOD_LINE_VALUE_ACTIVE);
 		usleep(1);
 
 		for (int i = GPIO_D0; i <= GPIO_D7; i++) {
-			value = ugpio_get_value(GPIOS[i].io);
+			value = gpiod_line_request_get_value(GPIOS[i].io,
+							     GPIOS[i].num);
 			inputs |= ((value & 1) << (i - GPIO_D0 + (8 * k)));
 		}
 
-		// Disable latch output
-		ugpio_set_value(GPIOS[GPIO_INP_A_OE+k].io, 0);
+		/*
+		 * Disable latch output
+		 */
+		gpiod_line_request_set_value(GPIOS[GPIO_INP_A_OE+k].io,
+					     GPIOS[GPIO_INP_A_OE+k].num,
+					     GPIOD_LINE_VALUE_INACTIVE);
 	}
 
 	*data = inputs;
 
-	// Set as output
+	/*
+	 * Set as output
+	 */
 	for (int i = GPIO_D0; i <= GPIO_D7; i++) {
-		ugpio_direction_output(GPIOS[i].io, 0);
+		gpiod_reconfigure(GPIOS[i].io, GPIOS[i].num, GPIOD_LINE_DIRECTION_OUTPUT, GPIOS[i].active_low);
 	}
 	return 0;
 }
@@ -806,21 +923,18 @@ int hal_getInputs (int *data) {
  * Initialize all GPIO's
  */
 int hal_setup(void){
+	/*
+	 *  Open GPIO-chip
+	 */
+	chip = gpiod_chip_open(GPIOCHIP);
+	if (!chip)
+		return -1;
+
 	for (int j = GPIO_ENABLE_POWER; j < LAST_GPIO; j++){
-		GPIOS[j].io = ugpio_request_one(GPIOS[j].num, GPIOS[j].flags, "");
+		GPIOS[j].io = gpiod_get_output_line(chip,  GPIOS[j].num, GPIOS[j].active_low);
 
 		if (GPIOS[j].io == NULL) {
-			printf("ERROR: Could not alloc pin %d\n", GPIOS[j].num);
-			return -1;
-		}
-
-		if (ugpio_full_open(GPIOS[j].io) < 0){
-			printf("ERROR: Could not open %d\n", j);
-			return -1;
-		}
-
-		if (ugpio_set_activelow(GPIOS[j].io, GPIOS[j].active_low) < 0){
-			printf("ERROR: Could not set_activelow %d %d\n", j, errno);
+			printf("ERROR: Could not open gpio %d\n", GPIOS[j].num);
 			return -1;
 		}
 	}
@@ -836,14 +950,14 @@ int hal_setup(void){
 }
 
 /*
- * Close all fd's to the GPIO's in the sysfs filesystem.
+ * Release all GPIO's and close connection to the gpio chip.
  */
 void hal_teardown(void){
 	for (int j = GPIO_ENABLE_POWER; j < LAST_GPIO; j++){
-		ugpio_close(GPIOS[GPIO_ENABLE_POWER].io);
-		ugpio_free(GPIOS[GPIO_ENABLE_POWER].io);
-		GPIOS[GPIO_ENABLE_POWER].io = NULL;
+		gpiod_line_request_release(GPIOS[j].io);
+		GPIOS[j].io = NULL;
 	}
+	gpiod_chip_close(chip);
 }
 
 
@@ -1068,28 +1182,45 @@ int pin_toggleData(enum fc_pin pin, int toggles)
 		return -1;
 	}
 
-	// Set output, this ensures that the bus will have the right bits set.
-	// Also, the right address is set.
+	/*
+	 * Set output, this ensures that the bus will have the right bits set.
+	 * Also, the right address is set.
+	 */
 	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
 	if (retVal != 0) {
 		return -1;
 	}
 
 	if (pinSettings[pin].bitOffset == 1) {
-		ugpio_set_value(GPIOS[GPIO_D4].io, 1);
+		gpiod_line_request_set_value(GPIOS[GPIO_D4].io,
+					     GPIOS[GPIO_D4].num,
+					     GPIOD_LINE_VALUE_ACTIVE);
 	} else {
-		ugpio_set_value(GPIOS[GPIO_D6].io, 1);
+		gpiod_line_request_set_value(GPIOS[GPIO_D6].io,
+					     GPIOS[GPIO_D6].num,
+					     GPIOD_LINE_VALUE_ACTIVE);
 	}
 
 	for (int i=0; i<toggles; i++){
 		if (pinSettings[pin].bitOffset == 1) {
-			ugpio_set_value(GPIOS[GPIO_D5].io, i & 1);
+			gpiod_line_request_set_value(GPIOS[GPIO_D5].io,
+						     GPIOS[GPIO_D5].num,
+						     (i & 1) ? GPIOD_LINE_VALUE_ACTIVE :
+						      GPIOD_LINE_VALUE_INACTIVE);
 		} else {
-			ugpio_set_value(GPIOS[GPIO_D7].io, i & 1);
+			gpiod_line_request_set_value(GPIOS[GPIO_D7].io,
+						     GPIOS[GPIO_D7].num,
+						     (i & 1) ? GPIOD_LINE_VALUE_ACTIVE :
+						      GPIOD_LINE_VALUE_INACTIVE);
 		}
 
-		ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 1);
-		ugpio_set_value(GPIOS[GPIO_SELECT_OUT].io, 0);
+		gpiod_line_request_set_value(GPIOS[GPIO_SELECT_OUT].io,
+					     GPIOS[GPIO_SELECT_OUT].num,
+					     GPIOD_LINE_VALUE_ACTIVE);
+		usleep(1);
+		gpiod_line_request_set_value(GPIOS[GPIO_SELECT_OUT].io,
+					     GPIOS[GPIO_SELECT_OUT].num,
+					     GPIOD_LINE_VALUE_INACTIVE);
 	}
 
 	retVal = setOut(pinSettings[pin].b->address, pinSettings[pin].b->data.data);
@@ -1114,7 +1245,9 @@ int pin_setGnd(enum fc_pin pin, int data)
 		return -1;
 	}
 
-	// Setting do bit ties the pin to ground.
+	/*
+	 * Setting do bit ties the pin to ground.
+	 */
 	if (pinSettings[pin].bitOffset == 1) {
 		pinSettings[pin].b->data.level.do1 = (data) ? 1 : 0;
 	} else {

@@ -7,7 +7,7 @@ serial number 203.
 
 The modules uses 0 and -3V volts for the logical 0 and 1. The tester can detect both logical and electrical failures.
 
-The software runs on a Raspberry Pi with [Raspberry Pi OS](https://www.raspberrypi.com/software/).
+The software runs on a Raspberry Pi with [Raspberry Pi OS](https://www.raspberrypi.com/software/). It's been tested with Raspberry Pi OS 11/12 on Raspberry Pi 3/4/5.
 
 ![BRS-tester](https://www.abc80.net/pics/brs-tester.jpg)
 
@@ -70,16 +70,21 @@ enable_uart=1
 
 The default speed is 115200 baud, if you want something else, change /boot/cmdline.txt
 
+Install tools for build:
 
-Install libugpio:
+...
+sudo apt install git
+sudo apt install autoconf
+sudo apt install autoconf-archive
+....
+
+Install libgpiod:
 
 ```
-git clone https://github.com/mhei/libugpio.git
-sudo apt install autoconf
-sudo apt install libtool
-cd libugpio
+cd ~/
+git clone https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git
+cd libgpiod
 ./autogen.sh
-./configure
 make
 sudo make install
 ```
@@ -87,7 +92,9 @@ sudo make install
 Get and install the brs-tester (this package),
 
 ```
-git clone
+cd ~/
+git clone https://github.com/anders-bzn/brs-tester.git
+cd brs-tester
 make
 sudo make install
 ```
