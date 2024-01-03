@@ -72,11 +72,11 @@ The default speed is 115200 baud, if you want something else, change /boot/cmdli
 
 Install tools for build:
 
-...
+```
 sudo apt install git
 sudo apt install autoconf
 sudo apt install autoconf-archive
-...
+```
 
 Install libgpiod:
 
