@@ -76,7 +76,7 @@ Install tools for build:
 sudo apt install git
 sudo apt install autoconf
 sudo apt install autoconf-archive
-....
+...
 
 Install libgpiod:
 
