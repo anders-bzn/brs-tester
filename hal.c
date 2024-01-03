@@ -1,3 +1,6 @@
+#include <linux/gpio.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -16,12 +19,6 @@
 #define FILE_VOLTAGE1_SCALE	"/sys/bus/iio/devices/iio:device0/in_voltage1_scale"
 #define FILE_VOLTAGE3_RAW	"/sys/bus/iio/devices/iio:device0/in_voltage3_raw"
 #define FILE_VOLTAGE3_SCALE	"/sys/bus/iio/devices/iio:device0/in_voltage3_scale"
-
-#ifdef PI_V
-#define GPIOCHIP "/dev/gpiochip4"
-#else
-#define GPIOCHIP "/dev/gpiochip0"
-#endif
 
 /*
  * Definitions for GPIO's
@@ -476,6 +473,64 @@ static struct pinSetting pinSettings[] = {
 */
 
 
+static int
+get_gpio_device(char ** dev) {
+	struct gpiochip_info info;
+	int fd, ret = 0;
+
+/*
+ * Try to figure out if the target is a Rpi 3,4 or 5
+ *
+ * Rpi 3: Chip label: pinctrl-bcm2835, Chip name: gpiochip0, Number of lines: 54
+ * Rpi 4: Chip label: pinctrl-bcm2711, Chip name: gpiochip0, Number of lines 58
+ * Rpi 5: Chip label: pinctrl-rp1, Chip name: gpiochip4, Number of lines: 54
+ *
+ */
+	*dev = "/dev/gpiochip0";
+	fd = open(*dev, O_RDONLY);
+
+	if (fd < 0) {
+		printf("Unabled to open %s: %s\n", *dev, strerror(errno));
+		return -1;
+	}
+
+	ret = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, &info);
+	close(fd);
+
+	if (ret == -1) {
+		printf("Unable to get chip info from ioctl: %s\n", strerror(errno));
+		return ret;
+	}
+
+	if (info.lines == 54 || info.lines == 58) {
+		return 0;
+	}
+
+	*dev = "/dev/gpiochip4";
+	fd = open(*dev, O_RDONLY);
+
+	if (fd < 0) {
+		printf("Unabled to open %s: %s\n", *dev, strerror(errno));
+		return fd;
+	}
+
+	ret = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, &info);
+	close(fd);
+
+	if (ret == -1) {
+		printf("Unable to get chip info from ioctl: %s\n", strerror(errno));
+		return ret;
+	}
+
+	if (info.lines == 54) {
+		return 0;
+	}
+
+	printf("Unable to figure out Rpi model\n");
+	return -1;
+}
+
+
 static struct gpiod_line_request *
 gpiod_get_output_line(struct gpiod_chip *chip,
 		      unsigned int offset,
@@ -923,10 +978,15 @@ int hal_getInputs (int *data) {
  * Initialize all GPIO's
  */
 int hal_setup(void){
+	char * path = NULL;
 	/*
 	 *  Open GPIO-chip
 	 */
-	chip = gpiod_chip_open(GPIOCHIP);
+	if (get_gpio_device(&path) < 0) {
+		return -1;
+	}
+
+	chip = gpiod_chip_open(path);
 	if (!chip)
 		return -1;
 
