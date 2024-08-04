@@ -1,3 +1,3 @@
 #!/bin/bash
 
-brs_tester --init
+brs_tester init
