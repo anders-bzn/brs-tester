@@ -34,11 +34,26 @@ tested i takes a file with test vectors.
 
 At startup a udev rule tiggered on the start of the GPIO subsysten will run
 a shell script that will export all necessary GPIO pins and run
-'brs-tester --init'. This will initialize the tester and put the hardware
+'brs-tester init'. This will initialize the tester and put the hardware
 in a known state.
 
 ## Using the tester
-TBD
+Initialize the hardware
+```
+$ brs-tester init
+```
+Run a selftest of the hardware, no test object should be in the tester
+```
+$ brs-tester selftest
+```
+Run test on a board, loop logical test loop number of times.
+```
+$ brs-tester test --vector=vectors/b104.fct --loop=10
+```
+Turn on power to the test object.
+```
+$ brs-tester debug --power-enable=on
+```
 
 ## Test vectors
 There is a template file in the "vectors" folder that tries to explain how it works.
