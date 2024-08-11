@@ -10,7 +10,7 @@ TODO: list of things to implement/fix
 [x] Validate test vectors more (validate characters)
 [x] Move out test functions to own file
 [x] Let Makefile install everything?
-[ ] Parse command line arguments first, then execute
+[x] Parse command line arguments first, then execute
 [x] udev does not run the script. Absoulte path?
 [x] Break on failures
 [x] Load and verify vectors in own file
