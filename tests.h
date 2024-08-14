@@ -1,4 +1,11 @@
 /*
+ * BRS-tester by Anders Sandahl 2023-2024
+ *
+ * License GPL 2.0
+ *
+ */
+
+/*
  * Do a electrical test of the tester itself
  */
 int tests_selfTest(void);

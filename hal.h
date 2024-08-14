@@ -1,4 +1,11 @@
 /*
+ * BRS-tester by Anders Sandahl 2023-2024
+ *
+ * License GPL 2.0
+ *
+ */
+
+/*
  * Definition of PIN vs number
  */
 enum fc_pin {

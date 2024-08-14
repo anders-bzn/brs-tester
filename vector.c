@@ -1,3 +1,11 @@
+/*
+ * BRS-tester by Anders Sandahl 2023-2024
+ *
+ * License GPL 2.0
+ *
+ * vector.c: Parser for test vectors
+ *
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
