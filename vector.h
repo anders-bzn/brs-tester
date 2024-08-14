@@ -1,3 +1,10 @@
+/*
+ * BRS-tester by Anders Sandahl 2023-2024
+ *
+ * License GPL 2.0
+ *
+ */
+
 #define VECTOR_LENGTH 37
 
 struct config {

@@ -1,3 +1,11 @@
+/*
+ * BRS-tester by Anders Sandahl 2023-2024
+ *
+ * License GPL 2.0
+ *
+ * hal.c: Hardware abstraction
+ *
+ */
 #include <linux/gpio.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>

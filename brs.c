@@ -1,3 +1,11 @@
+/*
+ * BRS-tester by Anders Sandahl 2023-2024
+ *
+ * License GPL 2.0
+ *
+ * brs.c: Main function and argument parsing
+ *
+ */
 #include <argp.h>
 #include <stdbool.h>
 #include <stdio.h>

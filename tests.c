@@ -1,3 +1,11 @@
+/*
+ * BRS-tester by Anders Sandahl 2023-2024
+ *
+ * License GPL 2.0
+ *
+ * tests.c: Functions for testing
+ *
+ */
 #include <stdio.h>
 #include <unistd.h>
 #include <math.h>
