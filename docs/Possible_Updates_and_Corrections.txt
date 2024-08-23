@@ -1,3 +1,6 @@
 Backplane Board
 	Change signal name 10V_SWITCHED to +10V_SWITCHED
 	Rename 3V3 and 3V3_1 to 3V3 and VCC to match the PSU
+
+PSU Board
+	Change the 2x 3-contact Wago connectors to 1x 6x contact Wago connector so the connectors cannot be interchanged.
