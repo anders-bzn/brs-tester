@@ -2,7 +2,7 @@
 
 This project implements a tester for DEC flipchips in the B/R/S series.
 Those modules are used in PDP-8, PDP-8/S, PDP-9 and in PDP-10 with KA processor.
-This project was created as a part of the restoration os the PDP-9 with
+This project was created as a part of the restoration of the PDP-9 with
 serial number 203.
 
 The modules uses 0 and -3V volts for the logical 0 and 1. The tester can detect both logical and electrical failures.
