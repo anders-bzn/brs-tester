@@ -87,7 +87,7 @@ If you want a serial console connected to the pin header on the back:
 enable_uart=1
 ```
 
-The default speed is 115200 baud, if you want something else, change /boot/cmdline.txt
+The default speed is 115200 baud, if you want something else, change /boot/firmware/cmdline.txt
 
 Install tools for build:
 
