@@ -1,1 +1,0 @@
-SUBSYSTEM=="gpio*", PROGRAM="/usr/local/bin/brs-init.sh"

@@ -1,4 +1,4 @@
-BIN = brs_tester
+BIN = brs-tester
 CFLAGS = -g -Wall -O3
 CFILES=hal.c brs.c vector.c tests.c
 HFILES=hal.h vector.h tests.h
@@ -7,7 +7,7 @@ RULES_DIR=/usr/lib/udev/rules.d
 BIN_DIR=/usr/local/bin
 
 INIT=brs-init.sh
-RULES=99-brs_tester-init.rules
+RULES=99-brs-tester-init.rules
 
 all: $(CFILES) $(HFILES) Makefile
 	$(CC) $(CFILES) -o $(BIN) $(CFLAGS) -L/usr/local/lib -l$(LIBS) -Wl,-rpath=/usr/local/lib
