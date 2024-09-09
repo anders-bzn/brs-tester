@@ -59,7 +59,11 @@ $ brs-tester debug --power-enable=on
 There is a template file in the "vectors" folder that tries to explain how it works.
 
 ## Setting up the Raspberry Pi
-In /boot/config.txt
+
+Download [RasberryPi OS 12 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz) (the linked version is what this guide has been written for).
+
+
+In /boot/firmware/config.txt
 Enable I2C, Set I2C clock to 400kHz
 
 ```
@@ -91,14 +95,16 @@ Install tools for build:
 sudo apt install git
 sudo apt install autoconf
 sudo apt install autoconf-archive
+sudo apt install libtool
 ```
 
-Install libgpiod:
+Install libgpiod from source (Debian libgpiod-dev package  is to old):
 
 ```
 cd ~/
 git clone https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git
 cd libgpiod
+git checkout v2.1.3
 ./autogen.sh
 make
 sudo make install
