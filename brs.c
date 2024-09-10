@@ -1,4 +1,4 @@
-git checkout v2.1.3/*
+/*
  * BRS-tester by Anders Sandahl 2023-2024
  *
  * License GPL 2.0
