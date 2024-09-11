@@ -9,7 +9,7 @@ The modules uses 0 and -3V volts for the logical 0 and 1. The tester can detect 
 
 The software runs on a Raspberry Pi with [Raspberry Pi OS](https://www.raspberrypi.com/software/). It's been tested with Raspberry Pi OS 11/12 on Raspberry Pi 3/4/5.
 
-![BRS-tester](photo/brs-tester.jpg)
+![BRS-tester](photos/brs-tester.jpg)
 
 ## Electronics
 The major parts is:
