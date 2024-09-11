@@ -50,9 +50,9 @@ static char doc[] =
 
 /* The options we understand. */
 static struct argp_option options[] = {
-    {"vector",       'v', "FILE",   OPTION_ARG_OPTIONAL, "Testvector to run [test]"},
+    {"vector",       'v', "FILE",   OPTION_ARG_OPTIONAL, "Test vector to run [test]"},
     {"loop",         'l', "NUMBER", OPTION_ARG_OPTIONAL, "Number of iterations, doing loop testing [test]"},
-    {"power-enable", 'P', "on/off", OPTION_ARG_OPTIONAL, "Manual power contron [debug]"},
+    {"power-enable", 'P', "on/off", OPTION_ARG_OPTIONAL, "Manual power control [debug]"},
     {"pin",          'p', "PIN",    OPTION_ARG_OPTIONAL, "Manual pin manipulation [debug]"},
     {"pin-state",    's', "1/0/T",  OPTION_ARG_OPTIONAL, "Manual pin state [debug]"},
     { 0 }

@@ -20,7 +20,7 @@ The major parts is:
 - Load module
 
 ### Levelshifter boards
-There are fifteen boards that takes two pins each and can act as an input/outout levelshifter to 3.3 V TTL levels from 0 and -3 V levels. Every pin can be completely disconnect by a relay. Every pin can also be connected to the measurement bus.
+There are fifteen boards that takes two pins each and can act as an input/output level shifter to 3.3 V TTL levels from 0 and -3 V levels. Every pin can be completely disconnect by a relay. Every pin can also be connected to the measurement bus.
 ### Backplane board
 The backplane contains glue logic and a measurement circuit. It also interconnects all signals between the other boards.
 ### Power supply
@@ -28,11 +28,11 @@ Makes all voltages needed for the tester.
 ### Load module
 The load module can connect different resistors to the measurement bus in order to load test outputs from flipchips.
 ## Software
-For the time beeing the software is run from a shell and takes different
+For the time being the software is run from a shell and takes different
 input parameters. Run  brs-tester --help to get help text. When a board is
 tested i takes a file with test vectors.
 
-At startup a udev rule tiggered on the start of the GPIO subsysten will run
+At startup a udev rule triggered on the start of the GPIO subsystem will run
 a shell script that will export all necessary GPIO pins and run
 'brs-tester init'. This will initialize the tester and put the hardware
 in a known state.
@@ -42,7 +42,7 @@ Initialize the hardware
 ```
 $ brs-tester init
 ```
-Run a selftest of the hardware, no test object should be in the tester
+Run a self test of the hardware, no test object should be in the tester
 ```
 $ brs-tester selftest
 ```
@@ -59,7 +59,11 @@ $ brs-tester debug --power-enable=on
 There is a template file in the "vectors" folder that tries to explain how it works.
 
 ## Setting up the Raspberry Pi
-In /boot/config.txt
+
+Download [RasberryPi OS 12 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz) (the linked version is what this guide has been written for).
+
+
+In /boot/firmware/config.txt
 Enable I2C, Set I2C clock to 400kHz
 
 ```
@@ -83,7 +87,7 @@ If you want a serial console connected to the pin header on the back:
 enable_uart=1
 ```
 
-The default speed is 115200 baud, if you want something else, change /boot/cmdline.txt
+The default speed is 115200 baud, if you want something else, change /boot/firmware/cmdline.txt
 
 Install tools for build:
 
@@ -91,14 +95,16 @@ Install tools for build:
 sudo apt install git
 sudo apt install autoconf
 sudo apt install autoconf-archive
+sudo apt install libtool
 ```
 
-Install libgpiod:
+Install libgpiod from source (Debian libgpiod-dev package  is to old):
 
 ```
 cd ~/
 git clone https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git
 cd libgpiod
+git checkout v2.1.3
 ./autogen.sh
 make
 sudo make install
