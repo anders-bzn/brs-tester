@@ -9,7 +9,7 @@
 
 struct config {
 	char	pin_def[VECTOR_LENGTH];
-	int	output_drive_strenght;
+	int	output_drive_strength;
 	float	load_low;
 	float	load_low_margin;
 	float	load_high;
