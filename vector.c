@@ -223,11 +223,11 @@ int vector_loadVectors(char *filename, struct config *board)
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
 			}
-		} else if (0 == strncmp("output-drive-strenght='", str, sizeof("output-drive-strenght='")-1)) {
+		} else if (0 == strncmp("output-drive-strength='", str, sizeof("output-drive-strength='")-1)) {
 			int k, current = 0;
-			k = sscanf(str, "output-drive-strenght='%dmA'", &current);
+			k = sscanf(str, "output-drive-strength='%dmA'", &current);
 			if (k == 1 && current >= 0 && current < 127) {
-				board->output_drive_strenght = current;
+				board->output_drive_strength = current;
 			} else {
 				printf("ERROR: Error parse file line %d: %s\n", i, str);
 				return -1;
@@ -279,7 +279,7 @@ struct config *vector_allocConfig(void)
 {
 	struct config *b_cfg = malloc(sizeof(struct config));
 	memset(b_cfg->pin_def, 0, sizeof(char) * VECTOR_LENGTH);
-	b_cfg->output_drive_strenght = 0;
+	b_cfg->output_drive_strength = 0;
 	b_cfg->load_low = 0;
 	b_cfg->load_low_margin = 0;
 	b_cfg->load_high = 0;
