@@ -60,20 +60,16 @@ There is a template file in the "vectors" folder that tries to explain how it wo
 
 ## Setting up the Raspberry Pi
 
-Download [RasberryPi OS 12 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz) (the linked version is what this guide has been written for).
+Download [Rasberry Pi OS 12 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz) (the linked version is what this guide has been written for).
+
+The software uses an ADC connected to the I2C-1 on Raspberry Pi. To enable the ADC support a devicetree overlay needs to be loaded so that the Linux kernel know how it should be probed. On Raspberry Pi this is done by adding lines in the /boot/firmware/config.txt file.
 
 
-In /boot/firmware/config.txt
-Enable I2C, Set I2C clock to 400kHz
+Enable I2C, Set I2C clock to 400kHz and enable support for ADS1115 ADC:
 
 ```
 dtparam=i2c_arm=on
 dtparam=i2c_arm_baudrate=400000
-```
-
-Enable support for ADS1115 ADC:
-
-```
 dtoverlay=ads1115
 dtparam=cha_enable
 dtparam=chb_enable
@@ -81,14 +77,24 @@ dtparam=chc_enable
 dtparam=chd_enable
 ```
 
-If you want a serial console connected to the pin header on the back:
+If you want a serial console connected to the pin header on the back if the backplane board:
 
 ```
 enable_uart=1
 ```
 
-The default speed is 115200 baud, if you want something else, change /boot/firmware/cmdline.txt
+All those changes above can be done manually or by running the setup script.
+```
+sudo ./setup-pi.sh
+```
+If serial console shall be enables add the 'UART' parameter to the script.
+```
+sudo ./setup-pi.sh UART
+```
 
+After the changes in /boot/firmware/config.txt is saved, you need to reboot. When enabling serial console, the default speed is 115200 baud. If you want something else, change /boot/firmware/cmdline.txt
+
+## Building the software
 Install tools for build:
 
 ```
@@ -98,7 +104,7 @@ sudo apt install autoconf-archive
 sudo apt install libtool
 ```
 
-Install libgpiod from source (Debian libgpiod-dev package  is to old):
+Build and install libgpiod from source (the shipped Debian libgpiod-dev package is to old):
 
 ```
 cd ~/
