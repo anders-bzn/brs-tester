@@ -505,7 +505,7 @@ int tests_checkInputs(struct config const *b_cfg)
 	for (int pin = AA; pin < LAST_PIN; pin++) {
 		if (setup[pin] == 'i') {
 			float current, voltage, voltage_margin;
-			int result = 1;
+			int result;
 
 			char *str;
 			pin_getName(pin, &str);
@@ -519,17 +519,20 @@ int tests_checkInputs(struct config const *b_cfg)
 			if ((fabs(voltage - voltage_margin) > 100) ||
 			    (fabs(current - b_cfg->input_current) > b_cfg->input_current_margin)){
 				result = 0;
-			}
+			} else {
+                result = 1;
+            }
 			printf("Pin: %s H voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
 			pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
 			usleep(100000);
 			hal_measureCurrent(&current);
 			hal_measureVoltage(&voltage);
-
 			voltage_margin = b_cfg->input_active_level ? b_cfg->input_logic_high : -3700;
 			if ((fabs(voltage - voltage_margin) > 100) || (current < -0.1)){
 				result = 0;
-			}
+			} else {
+                result = 1;
+            }
 			printf("Pin: %s H voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
 			pin_setMeasure(pin, 0);
 			pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
