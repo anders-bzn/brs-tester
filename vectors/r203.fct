@@ -1,0 +1,27 @@
+# Test for R111, Expandable NAND/NOT Gate
+
+# Define the limits when testing inputs
+input-current='-1.0mA'
+input-current-margin='1.0mA'
+input-active-level='high'
+input-logic-high='-300mV'
+
+# Define how much current the outputs can sink
+output-drive-strength='20mA'
+
+# The 'config' key describes how the tested board has it connections. 
+# 
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppi--iii--iii--ii------------------'
+vector='---1----1----1----------------------'
+vector='---0----0----0----------------------'
+#config='pppiooiiiooiiiooii------------------'

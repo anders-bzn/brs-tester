@@ -1,0 +1,43 @@
+# Test for R113, NAND/NOR Gate
+
+# Define the limits when testing inputs
+input-current='-1.0mA'
+input-current-margin='1.0mA'
+input-active-level='high'
+input-logic-high='-300mV'
+
+# Define the limits when testing the clamped load resistors
+load-low='-3700mV'
+load-low-margin='500mV'
+load-high='-50mV'
+load-high-margin='100mV'
+load-current='-20mA'
+load-current-margin='5mA'
+
+# Define how much current the outputs can sink
+output-drive-strength='18mA'
+
+# The 'config' key describes how the tested board has it connections. 
+# 
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppiioiioiioiioiio------------------'
+vector='-----1--1--1--1--1------------------'
+vector='---001--1--1--1--1------------------'
+vector='---011--1--1--1--1------------------'
+vector='---101--1--1--1--1------------------'
+vector='---110--1--1--1--1------------------'
+vector='-----1001--1--1--1------------------'
+vector='-----1011--1--1--1------------------'
+vector='-----1101--1--1--1------------------'
+vector='-----1110--1--1--1------------------'
+vector='---110110110110110------------------'
+

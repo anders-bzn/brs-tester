@@ -240,6 +240,8 @@ int main (int argc, char *argv[])
         }
 
         printf("TEST: Setup board\n");
+        printf("AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB\n");
+        printf("ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV\n");
         tests_setupBoard(board_config);
 
         printf("TEST: Check pull downs\n");
