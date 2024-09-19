@@ -63,7 +63,7 @@ struct gpio {
 };
 
 /*
- * Array of struct that holds refrences to all GPIO's. Maps defines and
+ * Array of struct that holds references to all GPIO's. Maps defines and
  * initial configuration to all pin numbers.
  */
 struct gpio GPIOS[] = {
@@ -196,12 +196,12 @@ struct board {
 };
 
 /*
- * gpio chio global reference
+ * gpio chip global reference
  */
 static struct gpiod_chip *chip;
 
 /*
- * Total number of boards in the backplane. 15 levelshifters and one
+ * Total number of boards in the backplane. 15 level shifters and one
  * board for loading outputs on tested flipchips
  */
 #define NUM_BOARDS 16
@@ -233,7 +233,7 @@ static const char *pinFunctionStr[] = {
 
 
 /*
- * Mapping between PINS on a flipchip to backplane levelshifters. Not
+ * Mapping between PINS on a flipchip to backplane level shifters. Not
  * all pins are possible to test, like power and ground. But have them
  * in the list anyway.
  */
@@ -731,7 +731,7 @@ int hal_powerEnable(int on) {
 
 
 /*
- * Measure the current between the levelshifter and the flipchip pin
+ * Measure the current between the level shifter and the flipchip pin
  * under test.
  */
 int hal_measureCurrent(float *iMeas){
@@ -1045,7 +1045,7 @@ int hal_setDefault(void)
 
 
 /*
- * Enable a resitor load on the measurement bus. The current can be set
+ * Enable a resistor load on the measurement bus. The current can be set
  * from 0 to 126mA. Where 0 is disable. This can be used to verify drive
  * strength of output transistors on flipchips.
  */
