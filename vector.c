@@ -23,7 +23,7 @@ static int validate_format(char *str, enum check_format format)
 {
     int numTogglePins = 0;
     /*
-     * Check string for correct length, expect a traling "'"
+     * Check string for correct length, expect a trailing "'"
      */
     if (VECTOR_LENGTH + 1 != strlen(str)) {
         return -1;
@@ -61,7 +61,7 @@ static int validate_format(char *str, enum check_format format)
      * pin location.
      *
      * 'p' - power pin, do nothing
-     * 'i' - input pin on testet board
+     * 'i' - input pin on tested board
      * 'o' - output pin on tested board
      * 'O' - output pin on tested board, open collector
      * 'd' - pull down net on tested board
