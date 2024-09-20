@@ -526,7 +526,7 @@ int tests_checkInputs(struct config const *b_cfg)
             } else {
                 result = 1;
             }
-            printf("Pin: %s H voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
+            printf("Pin: %s 0 voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
             pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
             usleep(100000);
             hal_measureCurrent(&current);
@@ -537,7 +537,7 @@ int tests_checkInputs(struct config const *b_cfg)
             } else {
                 result = 1;
             }
-            printf("Pin: %s H voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
+            printf("Pin: %s 1 voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
             pin_setMeasure(pin, 0);
             pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
         }
