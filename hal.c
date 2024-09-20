@@ -63,7 +63,7 @@ struct gpio {
 };
 
 /*
- * Array of struct that holds refrences to all GPIO's. Maps defines and
+ * Array of struct that holds references to all GPIO's. Maps defines and
  * initial configuration to all pin numbers.
  */
 struct gpio GPIOS[] = {
@@ -196,12 +196,12 @@ struct board {
 };
 
 /*
- * gpio chio global reference
+ * gpio chip global reference
  */
 static struct gpiod_chip *chip;
 
 /*
- * Total number of boards in the backplane. 15 levelshifters and one
+ * Total number of boards in the backplane. 15 level shifters and one
  * board for loading outputs on tested flipchips
  */
 #define NUM_BOARDS 16
@@ -233,7 +233,7 @@ static const char *pinFunctionStr[] = {
 
 
 /*
- * Mapping between PINS on a flipchip to backplane levelshifters. Not
+ * Mapping between PINS on a flipchip to backplane level shifters. Not
  * all pins are possible to test, like power and ground. But have them
  * in the list anyway.
  */
@@ -498,7 +498,7 @@ get_gpio_device(char ** dev) {
     fd = open(*dev, O_RDONLY);
 
     if (fd < 0) {
-        printf("Unabled to open %s: %s\n", *dev, strerror(errno));
+        printf("ERROR: Could not open %s: %s\n", *dev, strerror(errno));
         return -1;
     }
 
@@ -518,7 +518,7 @@ get_gpio_device(char ** dev) {
     fd = open(*dev, O_RDONLY);
 
     if (fd < 0) {
-        printf("Unabled to open %s: %s\n", *dev, strerror(errno));
+        printf("ERROR: Could not open %s: %s\n", *dev, strerror(errno));
         return fd;
     }
 
@@ -731,7 +731,7 @@ int hal_powerEnable(int on) {
 
 
 /*
- * Measure the current between the levelshifter and the flipchip pin
+ * Measure the current between the level shifter and the flipchip pin
  * under test.
  */
 int hal_measureCurrent(float *iMeas){
@@ -744,7 +744,7 @@ int hal_measureCurrent(float *iMeas){
     FILE *fp = fopen(FILE_VOLTAGE3_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_RAW);
         return -1;
     }
 
@@ -758,7 +758,7 @@ int hal_measureCurrent(float *iMeas){
     fp = fopen(FILE_VOLTAGE3_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_SCALE);
         return -1;
     }
 
@@ -772,7 +772,7 @@ int hal_measureCurrent(float *iMeas){
     fp = fopen(FILE_VOLTAGE0_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE0_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE0_RAW);
         return -1;
     }
 
@@ -786,7 +786,7 @@ int hal_measureCurrent(float *iMeas){
     fp = fopen(FILE_VOLTAGE0_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE0_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE0_SCALE);
         return -1;
     }
 
@@ -819,7 +819,7 @@ int hal_measureVoltage(float *uMeas){
     FILE *fp = fopen(FILE_VOLTAGE3_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_RAW);
         return -1;
     }
 
@@ -833,7 +833,7 @@ int hal_measureVoltage(float *uMeas){
     fp = fopen(FILE_VOLTAGE3_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_SCALE);
         return -1;
     }
 
@@ -847,7 +847,7 @@ int hal_measureVoltage(float *uMeas){
     fp = fopen(FILE_VOLTAGE1_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE1_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE1_RAW);
         return -1;
     }
 
@@ -861,7 +861,7 @@ int hal_measureVoltage(float *uMeas){
     fp = fopen(FILE_VOLTAGE1_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE1_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE1_SCALE);
         return -1;
     }
 
@@ -894,7 +894,7 @@ int hal_measureVoltageRef(float *uMeas){
     FILE *fp = fopen(FILE_VOLTAGE3_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_RAW);
         return -1;
     }
 
@@ -908,7 +908,7 @@ int hal_measureVoltageRef(float *uMeas){
     fp = fopen(FILE_VOLTAGE3_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_SCALE);
         return -1;
     }
 
@@ -1045,7 +1045,7 @@ int hal_setDefault(void)
 
 
 /*
- * Enable a resitor load on the measurement bus. The current can be set
+ * Enable a resistor load on the measurement bus. The current can be set
  * from 0 to 126mA. Where 0 is disable. This can be used to verify drive
  * strength of output transistors on flipchips.
  */

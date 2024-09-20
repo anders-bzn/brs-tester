@@ -25,9 +25,11 @@ int tests_selfTest(void)
     hal_setDefault();
 
     /*
-     * First measure referece voltage, it sould be 1700 mV nominal
+     * First measure reference voltage, it should be 1700 mV nominal
      */
-    hal_measureVoltageRef(&voltage_ref);
+    if (hal_measureVoltageRef(&voltage_ref) < 0) {
+        return -1;
+    }
 
     if (fabs(voltage_ref - 1700.0) < 15) {
         voltage_ref_ok = 1;
@@ -109,7 +111,7 @@ int tests_selfTest(void)
         int current_ok = 0;
 
         /*
-         * In an ideal world, grounding the load restistors would have given
+         * In an ideal world, grounding the load resistors would have given
          * current 2, 4, 8, 16, 32 and 64 mA. However, the measurement resistor for current
          * and RDS(on) in the FET end up in series when testing the loads.
          */
@@ -182,7 +184,7 @@ int tests_setupBoard(struct config const *b_cfg)
      * pppiodiodiodiodiod------------------
      *
      * 'p' - power pin, do nothing
-     * 'i' - input pin on testet board
+     * 'i' - input pin on tested board
      * 'o' - output pin on tested board
      * 'O' - output pin on tested board, open collector
      * 'd' - pull down net on tested board
@@ -201,7 +203,7 @@ int tests_setupBoard(struct config const *b_cfg)
         case 'i':
             /*
              * NOTE: PIN_OUTPUT is from the testers view.
-             * The format string descripbes the board under
+             * The format string describes the board under
              * test.
              */
             printf("i");
@@ -218,7 +220,7 @@ int tests_setupBoard(struct config const *b_cfg)
         case 'o':
             /*
              * NOTE: PIN_INPUT is from the testers view.
-             * The format string descripbes the board under
+             * The format string describes the board under
              * test.
              */
             printf("o");
@@ -227,7 +229,7 @@ int tests_setupBoard(struct config const *b_cfg)
         case 'd':
             /*
              * NOTE: PIN_INPUT is from the testers view.
-             * The format string descripbes the board under
+             * The format string describes the board under
              * test. Setup pull down as input???
              */
             printf("d");
@@ -259,7 +261,7 @@ int tests_checkVoltages(struct config const *b_cfg)
      * pppiodiodiodiodiod------------------
      *
      * 'p' - power pin, do nothing
-     * 'i' - input pin on testet board
+     * 'i' - input pin on tested board
      * 'o' - output pin on tested board
      * 'O' - output pin on tested board, open collector
      * 'd' - pull down net on tested board
@@ -326,7 +328,7 @@ int tests_checkPullDown(struct config const *b_cfg)
      * pppiodiodiodiodiod------------------
      *
      * 'p' - power pin, do nothing
-     * 'i' - input pin on testet board
+     * 'i' - input pin on tested board
      * 'o' - output pin on tested board
      * 'O' - output pin on tested board, open collector
      * 'd' - pull down net on tested board
@@ -398,7 +400,7 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
      * pppiodiodiodiodiod------------------
      *
      * 'p' - power pin, do nothing
-     * 'i' - input pin on testet board
+     * 'i' - input pin on tested board
      * 'o' - output pin on tested board
      * 'O' - output pin on tested board, open collector
      * 'd' - pull down net on tested board
@@ -490,14 +492,16 @@ int tests_checkInputs(struct config const *b_cfg)
     /* Setup string can look like this:
      * pppiodiodiodiodiod------------------
      *
-     * 'i' - input pin on testet board
+     * 'i' - input pin on tested board
      *
      * Just care about the inputs.
      */
 
     for (int pin = AA; pin < LAST_PIN; pin++) {
         if (setup[pin] == 'i') {
-            // Set inactive level on all inputs
+            /*
+             * Set inactive level on all inputs
+             */
             pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
         }
     }
