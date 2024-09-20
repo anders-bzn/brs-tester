@@ -60,7 +60,7 @@ There is a template file in the "vectors" folder that tries to explain how it wo
 
 ## Setting up the Raspberry Pi
 
-Download [Rasberry Pi OS 12 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz) (the linked version is what this guide has been written for).
+Download [Raspberry Pi OS 12 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz) (the linked version is what this guide has been written for).
 
 The software uses an ADC connected to the I2C-1 on Raspberry Pi. To enable the ADC support a devicetree overlay needs to be loaded so that the Linux kernel know how it should be probed. On Raspberry Pi this is done by adding lines in the /boot/firmware/config.txt file.
 
