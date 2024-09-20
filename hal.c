@@ -498,7 +498,7 @@ get_gpio_device(char ** dev) {
     fd = open(*dev, O_RDONLY);
 
     if (fd < 0) {
-        printf("Unabled to open %s: %s\n", *dev, strerror(errno));
+        printf("ERROR: Could not open %s: %s\n", *dev, strerror(errno));
         return -1;
     }
 
@@ -518,7 +518,7 @@ get_gpio_device(char ** dev) {
     fd = open(*dev, O_RDONLY);
 
     if (fd < 0) {
-        printf("Unabled to open %s: %s\n", *dev, strerror(errno));
+        printf("ERROR: Could not open %s: %s\n", *dev, strerror(errno));
         return fd;
     }
 
@@ -744,7 +744,7 @@ int hal_measureCurrent(float *iMeas){
     FILE *fp = fopen(FILE_VOLTAGE3_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_RAW);
         return -1;
     }
 
@@ -758,7 +758,7 @@ int hal_measureCurrent(float *iMeas){
     fp = fopen(FILE_VOLTAGE3_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_SCALE);
         return -1;
     }
 
@@ -772,7 +772,7 @@ int hal_measureCurrent(float *iMeas){
     fp = fopen(FILE_VOLTAGE0_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE0_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE0_RAW);
         return -1;
     }
 
@@ -786,7 +786,7 @@ int hal_measureCurrent(float *iMeas){
     fp = fopen(FILE_VOLTAGE0_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE0_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE0_SCALE);
         return -1;
     }
 
@@ -819,7 +819,7 @@ int hal_measureVoltage(float *uMeas){
     FILE *fp = fopen(FILE_VOLTAGE3_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_RAW);
         return -1;
     }
 
@@ -833,7 +833,7 @@ int hal_measureVoltage(float *uMeas){
     fp = fopen(FILE_VOLTAGE3_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_SCALE);
         return -1;
     }
 
@@ -847,7 +847,7 @@ int hal_measureVoltage(float *uMeas){
     fp = fopen(FILE_VOLTAGE1_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE1_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE1_RAW);
         return -1;
     }
 
@@ -861,7 +861,7 @@ int hal_measureVoltage(float *uMeas){
     fp = fopen(FILE_VOLTAGE1_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE1_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE1_SCALE);
         return -1;
     }
 
@@ -894,7 +894,7 @@ int hal_measureVoltageRef(float *uMeas){
     FILE *fp = fopen(FILE_VOLTAGE3_RAW, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_RAW);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_RAW);
         return -1;
     }
 
@@ -908,7 +908,7 @@ int hal_measureVoltageRef(float *uMeas){
     fp = fopen(FILE_VOLTAGE3_SCALE, "r");
 
     if (fp == NULL) {
-        printf("ERROR: %s\n", FILE_VOLTAGE3_SCALE);
+        printf("ERROR: Could not open: %s\n", FILE_VOLTAGE3_SCALE);
         return -1;
     }
 

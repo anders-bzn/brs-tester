@@ -27,7 +27,9 @@ int tests_selfTest(void)
     /*
      * First measure reference voltage, it should be 1700 mV nominal
      */
-    hal_measureVoltageRef(&voltage_ref);
+    if (hal_measureVoltageRef(&voltage_ref) < 0) {
+        return -1;
+    }
 
     if (fabs(voltage_ref - 1700.0) < 15) {
         voltage_ref_ok = 1;
