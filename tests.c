@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "hal.h"
 #include "vector.h"
@@ -395,6 +396,7 @@ int tests_checkPullDown(struct config const *b_cfg)
 int tests_checkLogic(struct config const *b_cfg, char *vector)
 {
     char const *setup = b_cfg->pin_def;
+    bool test_failed = false;
 
     /* Setup string can look like this:
      * pppiodiodiodiodiod------------------
@@ -436,7 +438,9 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
     }
     printf("\n");
 
-    // Check for toggling pin
+    /*
+     * Check for toggling pin
+     */
     for (int pin = AA; pin < LAST_PIN; pin ++) {
         char *pinName;
 
@@ -468,7 +472,10 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
 
             if ( vector[pin] == ('0' + data_in)){
                 data_ok = 1;
+            } else {
+                test_failed = true;
             }
+
             printf("%c", data_ok ? '0' + data_in : 'F');
             break;
         default:
@@ -476,7 +483,7 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
             return -1;
         }
     }
-    printf("\n");
+    printf("      [ %s ] \n", test_failed ? "FAIL" : " OK ");
     return 0;
 }
 
@@ -532,6 +539,7 @@ int tests_checkInputs(struct config const *b_cfg)
             hal_measureCurrent(&current);
             hal_measureVoltage(&voltage);
             voltage_margin = b_cfg->input_active_level ? b_cfg->input_logic_high : -3700;
+
             if ((fabs(voltage - voltage_margin) > 100) || (current < -0.1)){
                 result = 0;
             } else {
