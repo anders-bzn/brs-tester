@@ -481,6 +481,8 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
 
                 printf("%c", data_ok ? '0' + data_in : 'F');
                 break;
+            } else {
+                printf("x");
             }
             break;
         default:
