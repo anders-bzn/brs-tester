@@ -1,0 +1,78 @@
+# Test for S206, Dual Flip-Flop
+
+# inputs
+# flip flop 1
+# L and K is inputs
+# D is clock pulse input
+# outputs are J and E
+
+# flip flop 2
+# U and T is inputs
+# N is clock pulse input
+# Outputs are P and R
+# General clear input on pin F
+
+
+# -3V = 1
+# 0V = 0
+
+# Define the limits when testing inputs
+input-current='-1.0mA'
+input-current-margin='20.0mA'
+input-active-level='high'
+input-logic-high='-300mV'
+
+# Define how much current the outputs can sink
+output-drive-strength='20mA'
+
+# The 'config' key describes how the tested board has it connections. 
+# 
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppiOiiOiiiiOOiiii------------------'
+# Testing reset input F.
+vector='----10-0----01----------------------'
+vector='----11-0----01----------------------'
+vector='----1--0----01----------------------'
+# Varying the inputs to make sure they are not affecting the flip-flop state.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='----1--000--01-00-------------------'
+vector='----1--011--01-11-------------------'
+vector='----1--010--01-10-------------------'
+vector='----1--001--01-01-------------------'
+# Testing a clock pulse in on both flip-flops.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---11--010-101-10-------------------'
+vector='---01--010-001-10-------------------'
+vector='---11--010-101-10-------------------'
+vector='---11--001-101-01-------------------'
+vector='---00--101-010-01-------------------'
+vector='---10--101-110-01-------------------'
+# Reset again
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='----10-0----01----------------------'
+vector='----11-0----01----------------------'
+vector='----1--0----01----------------------'
+# Test toggle
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---11--000-101-00-------------------'
+vector='---00--100-010-00-------------------'
+vector='---10--100-110-00-------------------'
+# Toggle back
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---10--100-110-00-------------------'
+vector='---01--000-001-00-------------------'
+vector='---11--000-101-00-------------------'
+
+vector='----1-10----011---------------------'
+vector='----1-00----010---------------------'
+vector='----1-10----011---------------------'
+#vector='------------------------------------'
