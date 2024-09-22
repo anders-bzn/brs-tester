@@ -1,0 +1,112 @@
+# Test for S206, Dual Flip-Flop
+# The S206 is a Dual JK flip-flop with a asynchronous clear and a synchronous set input.
+# Work in progress, all functions verified but the input check is failing.
+# inputs
+# flip flop 1
+# L and K are the JK inputs
+# D is clock pulse input
+# Synchronous set input (H) with clock (M)
+# outputs are J and E
+
+# flip flop 2
+# U and T are the JK inputs
+# N is clock pulse input
+# Synchronous set input (S) with clock (V)
+# Outputs are P and R
+# General asynchronous clear input on pin F
+
+
+# -3V = 1
+# 0V = 0
+# PLEASE NOTE - THE INPUT CHECK IS NOT PASSING ON MY S206. PERHAPS BAD OR NEEDS MODS BELOW!!
+# Define the limits when testing inputs
+input-current-low='0.0mA'
+input-current-high='-3.7mA'
+input-current-margin='1.0mA'
+input-voltage-low='-3700mV'
+input-voltage-high='-50mV'
+
+# Define how much current the outputs can sink
+output-drive-strength='20mA'
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppiOiiOiiiiOOiiii------------------'
+# Testing reset input F.
+vector='----10-0----01----------------------'
+vector='----11-0----01----------------------'
+vector='----1--0----01----------------------'
+# Varying the inputs to make sure they are not affecting the flip-flop state.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='----1--000--01-00-------------------'
+vector='----1--011--01-11-------------------'
+vector='----1--010--01-10-------------------'
+vector='----1--001--01-01-------------------'
+# Testing a clock pulse in on both flip-flops.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---11--010-101-10-------------------'
+vector='---01--010-001-10-------------------'
+vector='---11--010-101-10-------------------'
+vector='---11--001-101-01-------------------'
+vector='---00--101-010-01-------------------'
+vector='---10--101-110-01-------------------'
+# Reset again
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='----10-0----01----------------------'
+vector='----11-0----01----------------------'
+vector='----1--0----01----------------------'
+# Test toggle
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---11--000-101-00-------------------'
+vector='---00--100-010-00-------------------'
+vector='---10--100-110-00-------------------'
+# Test do nothing on the JK inputs. Nothing should change
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---10--111-110-11-------------------'
+vector='---00--111-010-11-------------------'
+vector='---10--111-110-11-------------------'
+# Toggle back
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---10--100-110-00-------------------'
+vector='---01--000-001-00-------------------'
+vector='---11--000-101-00-------------------'
+# Test do nothing on the JK inputs. Nothing should change
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---11--011-101-11-------------------'
+vector='---01--011-001-11-------------------'
+vector='---11--011-101-11-------------------'
+# Test H and S inputs. Nothing should happen without the clock.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='----1-10----011---------------------'
+vector='----1-00----010---------------------'
+vector='----1-10----011---------------------'
+# Now clock in data on H and S with clock on M and V.
+# Clock in a 1 both flip-flops.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='----1-10--1-011--1------------------'
+vector='----1-10--0-011--0------------------'
+vector='----1-10--1-011--1------------------'
+# Clock in a 0 in both flip-flops
+vector='----1-00--1-010--1------------------'
+vector='----0-01--0-100--0------------------'
+vector='----0-01--1-100--1------------------'
+# Clock in a 1 again! Should not change the state since H and S are just sync set inputs
+vector='----0-11--1-101--1------------------'
+vector='----0-11--0-101--0------------------'
+vector='----0-11--1-101--1------------------'
+# Reset again
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='----10-0----01----------------------'
+vector='----11-0----01----------------------'
+vector='----1--0----01----------------------'
+

@@ -196,11 +196,20 @@ int vector_loadVectors(char *filename, struct config *board)
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
             }
-        } else if (0 == strncmp("input-current='", str, sizeof("input-current='")-1)) {
+        } else if (0 == strncmp("input-current-low='", str, sizeof("input-current-low='")-1)) {
             float value = 0;
-            int k = sscanf(str, "input-current='%fmA'", &value);
+            int k = sscanf(str, "input-current-low='%fmA'", &value);
             if (k == 1) {
-                board->input_current = value;
+                board->input_current_low = value;
+            } else {
+                printf("ERROR: Error parse file line %d: %s\n", i, str);
+                return -1;
+            }
+        } else if (0 == strncmp("input-current-high='", str, sizeof("input-current-high='")-1)) {
+            float value = 0;
+            int k = sscanf(str, "input-current-high='%fmA'", &value);
+            if (k == 1) {
+                board->input_current_high = value;
             } else {
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
@@ -214,11 +223,20 @@ int vector_loadVectors(char *filename, struct config *board)
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
             }
-        } else if (0 == strncmp("input-logic-high='", str, sizeof("input-logic-high='")-1)) {
+        } else if (0 == strncmp("input-voltage-low='", str, sizeof("input-voltage-low='")-1)) {
             float value = 0;
-            int k = sscanf(str, "input-logic-high='%fmV'", &value);
+            int k = sscanf(str, "input-voltage-low='%fmV'", &value);
             if (k == 1) {
-                board->input_logic_high = value;
+                board->input_voltage_low = value;
+            } else {
+                printf("ERROR: Error parse file line %d: %s\n", i, str);
+                return -1;
+            }
+        } else if (0 == strncmp("input-voltage-high='", str, sizeof("input-voltage-high='")-1)) {
+            float value = 0;
+            int k = sscanf(str, "input-voltage-high='%fmV'", &value);
+            if (k == 1) {
+                board->input_voltage_high = value;
             } else {
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
@@ -241,10 +259,6 @@ int vector_loadVectors(char *filename, struct config *board)
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
             }
-        } else if (0 == strcmp("input-active-level='high'\n", str)) {
-            board->input_active_level = 0;
-        } else if (0 == strcmp("input-active-level='low'\n", str)) {
-            board->input_active_level = 1;
         } else {
             printf("ERROR: Error parse file line %d: %s\n", i, str);
             return -1;
@@ -286,10 +300,11 @@ struct config *vector_allocConfig(void)
     b_cfg->load_high_margin = 0;
     b_cfg->load_current = 0;
     b_cfg->load_current_margin = 0;
-    b_cfg->input_current = 0;
+    b_cfg->input_current_low = 0;
+    b_cfg->input_current_high = 0;
     b_cfg->input_current_margin = 0;
-    b_cfg->input_active_level = 0;
-    b_cfg->input_logic_high = 0;
+    b_cfg->input_voltage_low = 0;
+    b_cfg->input_voltage_high = 0;
     b_cfg->toggles = 0;
     return b_cfg;
 }
