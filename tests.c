@@ -252,6 +252,7 @@ int tests_setupBoard(struct config const *b_cfg)
     return 0;
 }
 
+
 int tests_checkVoltages(struct config const *b_cfg)
 {
     char const *str = b_cfg->pin_def;
@@ -466,17 +467,21 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
         case 'o':
         case 'O':
             /*
-             * Get data in
+             * Get data in. '-' in format string means "don't check".
              */
-            pin_getValue(pin, &data_in);
 
-            if ( vector[pin] == ('0' + data_in)){
-                data_ok = 1;
-            } else {
-                test_failed = true;
+            if (vector[pin] != '-') {
+                pin_getValue(pin, &data_in);
+
+                if (vector[pin] == ('0' + data_in)){
+                    data_ok = 1;
+                } else {
+                    test_failed = true;
+                }
+
+                printf("%c", data_ok ? '0' + data_in : 'F');
+                break;
             }
-
-            printf("%c", data_ok ? '0' + data_in : 'F');
             break;
         default:
             printf("ERROR: Format error\n");
