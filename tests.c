@@ -516,45 +516,45 @@ int tests_checkInputs(struct config const *b_cfg)
             /*
              * Set inactive level on all inputs
              */
-            pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
+            pin_setDataOut(pin, 0);
         }
     }
 
     for (int pin = AA; pin < LAST_PIN; pin++) {
         if (setup[pin] == 'i') {
-            float current, voltage, voltage_margin;
+            float current, voltage;
             int result;
 
             char *str;
             pin_getName(pin, &str);
-            voltage_margin = b_cfg->input_active_level ? -3700 : b_cfg->input_logic_high;
             pin_setMeasure(pin, 1);
-            pin_setDataOut(pin, b_cfg->input_active_level ? 1 : 0);
+            pin_setDataOut(pin, 1);
             usleep(200000);
             hal_measureCurrent(&current);
             hal_measureVoltage(&voltage);
 
-            if ((fabs(voltage - voltage_margin) > 100) ||
-                (fabs(current - b_cfg->input_current) > b_cfg->input_current_margin)){
+            if ((fabs(voltage - b_cfg->input_voltage_low) > 100) ||
+                (fabs(current - b_cfg->input_current_low) > b_cfg->input_current_margin)){
                 result = 0;
             } else {
                 result = 1;
             }
+
             printf("Pin: %s 0 voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
-            pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
+            pin_setDataOut(pin, 0);
             usleep(100000);
             hal_measureCurrent(&current);
             hal_measureVoltage(&voltage);
-            voltage_margin = b_cfg->input_active_level ? b_cfg->input_logic_high : -3700;
 
-            if ((fabs(voltage - voltage_margin) > 100) || (current < -0.1)){
+            if ((fabs(voltage - b_cfg->input_voltage_high) > 100) ||
+                (fabs(current - b_cfg->input_current_high) > b_cfg->input_current_margin)){
                 result = 0;
             } else {
                 result = 1;
             }
             printf("Pin: %s 1 voltage %7.1f current %7.1f [ %s ]\n", str, voltage, current, result ? " OK " : "FAIL");
             pin_setMeasure(pin, 0);
-            pin_setDataOut(pin, b_cfg->input_active_level ? 0 : 1);
+            pin_setDataOut(pin, 0);
         }
     }
     printf("\n");
