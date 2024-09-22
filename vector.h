@@ -16,10 +16,11 @@ struct config {
     float   load_high_margin;
     float   load_current;
     float   load_current_margin;
-    float   input_current;
+    float   input_current_high;
+    float   input_current_low;
     float   input_current_margin;
-    int     input_active_level;
-    float   input_logic_high;
+    float   input_voltage_high;
+    float   input_voltage_low;
     int     toggles;
 };
 

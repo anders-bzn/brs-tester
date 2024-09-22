@@ -39,10 +39,15 @@ load-current='-10mA'
 load-current-margin='1mA'
 
 # input-* keys defined limits when testing inputs
-input-current='-1.8mA'
 input-current-margin='0.2mA'
-input-active-level='high'
-input-logic-high='-110mV'
+
+# For a digital '0'
+input-voltage-high='-10mV'
+input-current-high='-1.8mA'
+
+# For a digital '1'
+input-voltage-low='-3700mV'
+input-current-low='0mA'
 
 # output-drives-strength defines how much current the outputs can sink
 output-drive-strength='26mA'
