@@ -1,19 +1,23 @@
 TODO: list of things to implement/fix
 -----------------------------------------------------------------------
-[x] Test input current
 [ ] Test output drive strength
-[x] Loop testing
-[x] Free testvectors
-[ ] What and where should result be printed
-[x] udev rule to initiate board and export gpios
+[ ] Allow individual configuration of electrical properties of PIN's
 [ ] Single step testing
+[ ] HALT or PAUSE when a failure occurs as option
+[ ] Add the possibility to output a pulse from a single line in logic test
+[ ] Use the tester as DMM (measurements in a loop)
+[ ] Add design files for electronics (KiCad)
+[x] Test input current
+[x] Loop testing
+[x] Free test vectors
+[x] What and where should result be printed
+[x] udev rule to initiate board and export GPIO's
 [x] Validate test vectors more (validate characters)
 [x] Move out test functions to own file
 [x] Let Makefile install everything?
 [x] Parse command line arguments first, then execute
-[x] udev does not run the script. Absoulte path?
+[x] udev does not run the script. Absolute path?
 [x] Break on failures
 [x] Load and verify vectors in own file
 [x] Clean up hal.c (return when error, handle errors)
-[ ] Use the modern /dev/ GPIO interface for GPIO's
-[ ] Allow individual configuration of electrical properties of PIN's
+[x] Use the modern /dev/ GPIO interface for GPIO's
