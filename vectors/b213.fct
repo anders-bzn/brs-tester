@@ -1,0 +1,60 @@
+# Test for B213, Dual JAM Flip-Flop
+# The S206 is a Dual D flip-flop with a asynchronous clear and set inputs.
+#
+# Flip-flop 1
+# U are the D input
+# T is clock pulse input
+# Asynchronous set input: S
+# Asynchronous clear input: R
+# outputs are P (Q) and N (/Q)
+# flip-flop clear when P is at -3V and N is at 0V
+# flip-flop set when P is at 0V and N is at -3V
+# N negative (-3) => flip-flop set
+# P negative (-3) = flip-flop clear
+
+# Flip-flop 2
+# K is the D input
+# J is clock pulse input
+# Asynchronous set input: H
+# Asynchronous clear input: F
+# Outputs are D (Q) and E (/Q)
+# flip-flop clear when E is at -3V and D is at 0V
+# flip-flop set when E is at 0V and D is at -3V
+# D negative (-3) => flip-flop set
+# E negative (-3) => flip-flop clear
+
+
+# Logic levels in this test
+# -3V = 1
+# 0V = 0
+
+
+# Define the limits when testing inputs
+input-current-low='0.0mA'
+input-current-high='-3.6mA'
+input-current-margin='1.1mA'
+input-voltage-low='-3700mV'
+input-voltage-high='-50mV'
+
+# Define how much current the outputs can sink
+output-drive-strength='20mA'
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='---OOiiiii-OOiiiii------------------'
+# Testing clear inputs R and F.
+vector='-----0-------0----------------------'
+vector='---011-----011----------------------'
+vector='---010-----010----------------------'
+# Testing set inputs H and S.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
