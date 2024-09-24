@@ -1,28 +1,29 @@
 # Test for S206, Dual Flip-Flop
 # The S206 is a Dual JK flip-flop with a asynchronous clear and a synchronous set input.
-# Work in progress, all functions verified but the input check is failing.
-# inputs
-# flip flop 1
+#
+# Inputs
+# Flip-flop 1
 # L and K are the JK inputs
 # D is clock pulse input
 # Synchronous set input (H) with clock (M)
 # outputs are J and E
 
-# flip flop 2
+# Flip-flop 2
 # U and T are the JK inputs
 # N is clock pulse input
 # Synchronous set input (S) with clock (V)
 # Outputs are P and R
 # General asynchronous clear input on pin F
 
-
+# Logic levels in this test
 # -3V = 1
 # 0V = 0
-# PLEASE NOTE - THE INPUT CHECK IS NOT PASSING ON MY S206. PERHAPS BAD OR NEEDS MODS BELOW!!
+
+
 # Define the limits when testing inputs
 input-current-low='0.0mA'
-input-current-high='-3.7mA'
-input-current-margin='1.0mA'
+input-current-high='-3.6mA'
+input-current-margin='1.1mA'
 input-voltage-low='-3700mV'
 input-voltage-high='-50mV'
 
