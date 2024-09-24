@@ -57,44 +57,36 @@ output-drive-strength='20mA'
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
 config='---OOiiiii-OOiiiii------------------'
 # Testing clear inputs R and F.
-vector='-----0-------0----------------------'
-vector='---011-----011----------------------'
-vector='---010-----010----------------------'
+vector='-----0000----0000-------------------'
+vector='---011000--011000-------------------'
+vector='---010000--010000-------------------'
 # Testing set inputs H and S.
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-vector='---01-0----01-0---------------------'
-vector='---10-1----10-1---------------------'
-vector='---10-0----10-0---------------------'
+vector='---010000--010000-------------------'
+vector='---100100--100100-------------------'
+vector='---100000--100000-------------------'
 # Testing clear inputs R and F again.
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-vector='---100-----100----------------------'
-vector='---011-----011----------------------'
-vector='---010-----010----------------------'
+vector='---100000--100000-------------------'
+vector='---011000--011000-------------------'
+vector='---010000--010000-------------------'
 # Testing a D inputs (U and K) set to 0V (0). The flip-flip should go into a set state.
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-vector='---01---0--01---0-------------------'
-vector='---01--00--01--00-------------------'
-vector='---10--10--10--10-------------------'
-vector='---10--00--10--00-------------------'
-vector='---10------10-----------------------'
+vector='---010000--010000-------------------'
+vector='---100010--100010-------------------'
+vector='---100000--100000-------------------'
 # Testing a D inputs (U and K) set to 0V (0) again. The flip-flip should remain in set state.
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-vector='---10---0--10---0-------------------'
-vector='---10--00--10--00-------------------'
-vector='---10--10--10--10-------------------'
-vector='---10--00--10--00-------------------'
-vector='---10------10-----------------------'
+vector='---100000--100000-------------------'
+vector='---100010--100010-------------------'
+vector='---100000--100000-------------------'
 # Testing a D inputs (U and K) set to -3V (1). The flip-flip should go into a clear state.
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-vector='---10---1--10---1-------------------'
-vector='---10--01--10--01-------------------'
-vector='---01--11--01--11-------------------'
-vector='---01--01--01--01-------------------'
-vector='---01------01-----------------------'
+vector='---100001--100001-------------------'
+vector='---010011--010011-------------------'
+vector='---010001--010001-------------------'
 # Testing a D inputs (U and K) set to -3V (1) again. The flip-flip should remain in clear state.
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-vector='---01---1--01---1-------------------'
-vector='---01--01--01--01-------------------'
-vector='---01--11--01--11-------------------'
-vector='---01--01--01--01-------------------'
-vector='---01------01-----------------------'
+vector='---010001--010001-------------------'
+vector='---010011--010011-------------------'
+vector='---010001--010001-------------------'
