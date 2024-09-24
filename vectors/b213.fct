@@ -4,8 +4,8 @@
 # Flip-flop 1
 # U is the D input
 # T is clock pulse input. It takes a negative going pulse.
-# If U are at 0V the D output will be at -3V and E will be at 0V after the clock pulse  (flip-flop cleared) 
-# If U are at -3V the D output will be at 0V and E will be at -3V after the clock pulse  (flip-flop set)
+# If U are at -3V the N output will be at 0V and P will be at -3V after the clock pulse  (flip-flop cleared) 
+# If U are at 0V the N output will be at -3V and P will be at 0V after the clock pulse  (flip-flop set)
 # Asynchronous set input: S
 # Asynchronous clear input: R
 # outputs are P (Q) and N (/Q)
@@ -17,10 +17,10 @@
 # Flip-flop 2
 # K is the D input
 # J is clock pulse input It takes a negative going pulse.
-# If K are at 0V the N output will be at -3V and P will be at 0V after the clock pulse  (flip-flop cleared) 
-# If K are at -3V the N output will be at 0V and P will be at -3V after the clock pulse  (flip-flop set)
-# Asynchronous set input: H
-# Asynchronous clear input: F
+# If K are at -3V the D output will be at 0V and E will be at -3V after the clock pulse  (flip-flop cleared) 
+# If K are at 0V the D output will be at -3V and E will be at 0V after the clock pulse  (flip-flop set)
+# Asynchronous set input: H - negative going pulse
+# Asynchronous clear input: F - negative going pulse
 # Outputs are D (Q) and E (/Q)
 # flip-flop clear when E is at -3V and D is at 0V
 # flip-flop set when E is at 0V and D is at -3V
@@ -70,31 +70,31 @@ vector='---10-0----10-0---------------------'
 vector='---100-----100----------------------'
 vector='---011-----011----------------------'
 vector='---010-----010----------------------'
-# Testing a D inputs (U and K) set to -3V (1). The flip-flip should go into a set state.
-#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-vector='---01---1--01---1-------------------'
-vector='---01--01--01--01-------------------'
-vector='---10--11--10--11-------------------'
-vector='---10--01--10--01-------------------'
-vector='---10------10-----------------------'
-# Testing a D inputs (U and K) set to -3V (1) again. The flip-flip should remain in set state.
-#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-vector='---10---1--10---1-------------------'
-vector='---10--01--10--01-------------------'
-vector='---10--11--10--11-------------------'
-vector='---10--01--10--01-------------------'
-vector='---10------10-----------------------'
-# Testing a D inputs (U and K) set to 0V (0). The flip-flip should go into a clear state.
-#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-vector='---10---0--10---0-------------------'
-vector='---10--00--10--00-------------------'
-vector='---01--10--01--10-------------------'
-vector='---01--00--01--00-------------------'
-vector='---01------01-----------------------'
-# Testing a D inputs (U and K) set to 0V (0) again. The flip-flip should remain in clear state.
+# Testing a D inputs (U and K) set to 0V (0). The flip-flip should go into a set state.
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
 vector='---01---0--01---0-------------------'
 vector='---01--00--01--00-------------------'
-vector='---01--10--01--10-------------------'
-vector='---01--00--01--00-------------------'
+vector='---10--10--10--10-------------------'
+vector='---10--00--10--00-------------------'
+vector='---10------10-----------------------'
+# Testing a D inputs (U and K) set to 0V (0) again. The flip-flip should remain in set state.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---10---0--10---0-------------------'
+vector='---10--00--10--00-------------------'
+vector='---10--10--10--10-------------------'
+vector='---10--00--10--00-------------------'
+vector='---10------10-----------------------'
+# Testing a D inputs (U and K) set to -3V (1). The flip-flip should go into a clear state.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---10---1--10---1-------------------'
+vector='---10--01--10--01-------------------'
+vector='---01--11--01--11-------------------'
+vector='---01--01--01--01-------------------'
+vector='---01------01-----------------------'
+# Testing a D inputs (U and K) set to -3V (1) again. The flip-flip should remain in clear state.
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector='---01---1--01---1-------------------'
+vector='---01--01--01--01-------------------'
+vector='---01--11--01--11-------------------'
+vector='---01--01--01--01-------------------'
 vector='---01------01-----------------------'
