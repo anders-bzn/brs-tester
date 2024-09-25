@@ -16,10 +16,11 @@ char *vectors[1000];
 
 enum check_format {
     FORMAT_CONFIG,
-    FORMAT_VECTOR
+    FORMAT_VECTOR,
+    FORMAT_LOAD
 };
 
-static int validate_format(char *str, enum check_format format)
+static int validate_format(char *str, char *cfg, enum check_format format)
 {
     int numTogglePins = 0;
     /*
@@ -94,6 +95,34 @@ static int validate_format(char *str, enum check_format format)
             }
         }
     }
+
+    /*
+     * Check vector string. Only allow "L" on outputs ('O' and 'o'). And only "-" on other pins
+     * pin location.
+     *
+     * 'p' - power pin, do nothing
+     * 'i' - input pin on tested board
+     * 'o' - output pin on tested board
+     * 'O' - output pin on tested board, open collector
+     * 'd' - pull down net on tested board
+     * 'g' - pin should be grounded on tested board
+     * '-' - pin should not be used
+     */
+
+    if (format == FORMAT_LOAD){
+        if (cfg == NULL)
+            return -1;
+
+        for(int i=0; i < VECTOR_LENGTH - 1; i++){
+            if (str[i] == '-')
+                continue;;
+
+            if (str[i] == 'L' && (cfg[i] == 'o' || cfg[i] == 'O'))
+                continue;
+
+            return -1;
+        }
+    }
     return 0;
 }
 
@@ -120,7 +149,7 @@ int vector_loadVectors(char *filename, struct config *board)
             continue;
 
         if (0 == strncmp("config='", str, 8)){
-            if (0 > validate_format(&str[8], FORMAT_CONFIG)){
+            if (0 > validate_format(&str[8], NULL, FORMAT_CONFIG)){
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
             }
@@ -130,7 +159,7 @@ int vector_loadVectors(char *filename, struct config *board)
             strncpy(board->pin_def, &str[8], VECTOR_LENGTH);
             board->pin_def[VECTOR_LENGTH-1] = '\0';
         } else if (0 == strncmp("vector='", str, 8)){
-            if (0 > validate_format(&str[8], FORMAT_VECTOR)){
+            if (0 > validate_format(&str[8], NULL, FORMAT_VECTOR)){
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
             }
@@ -142,6 +171,16 @@ int vector_loadVectors(char *filename, struct config *board)
             vectors[k][VECTOR_LENGTH-1] = '\0';
             k++;
             vectors[k] = NULL;
+        } else if (0 == strncmp("load=  '", str, 8)){
+            if (0 > validate_format(&str[8], board->pin_def, FORMAT_LOAD)){
+                printf("ERROR: Error parse file line %d: %s\n", i, str);
+                return -1;
+            }
+            /*
+             * Break if error
+             */
+
+            printf("LOAD string OK %s", &str[8]);
         } else if (0 == strncmp("load-low='", str, sizeof("load-low='")-1)) {
             float value = 0;
             int k = sscanf(str, "load-low='%fmV'", &value);
