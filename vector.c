@@ -99,7 +99,7 @@ static int validate_format(char *str, enum check_format format)
 
 int vector_loadVectors(char *filename, struct config *board)
 {
-    char str[100];
+    char str[200];
     FILE *fp = fopen(filename, "r");
 
     if (fp == NULL) {
@@ -109,7 +109,7 @@ int vector_loadVectors(char *filename, struct config *board)
 
     int k=0, i=0;
     while (!feof(fp)) {
-        if (!fgets(str, 100, fp))
+        if (!fgets(str, 200, fp))
             break;
         i++;
 
