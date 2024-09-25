@@ -1,18 +1,19 @@
 # Test for B213, Dual JAM Flip-Flop
 # The B213 is a Dual D flip-flop with a asynchronous clear and set inputs.
+# WORK IN PROGRESS! Compare this version and the two previous versions and test on your B213!
 #
 # Flip-flop 1
 # U is the D input
 # T is clock pulse input. It takes a negative going pulse.
 # If U are at -3V the N output will be at 0V and P will be at -3V after the clock pulse  (flip-flop cleared) 
 # If U are at 0V the N output will be at -3V and P will be at 0V after the clock pulse  (flip-flop set)
-# Asynchronous set input: S
-# Asynchronous clear input: R
+# Asynchronous set input: S - negative going pulse
+# Asynchronous clear input: R - negative going pulse
 # outputs are P (Q) and N (/Q)
 # flip-flop clear when P is at -3V and N is at 0V
 # flip-flop set when P is at 0V and N is at -3V
 # N negative (-3) => flip-flop set
-# P negative (-3) = flip-flop clear
+# P negative (-3) => flip-flop clear
 
 # Flip-flop 2
 # K is the D input
@@ -55,7 +56,7 @@ output-drive-strength='20mA'
 
 #       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-config='---OOiiiii-OOiiiii------------------'
+config='---ooiiii-gooiiii-------------------'
 # Testing clear inputs R and F.
 vector='-----0000----0000-------------------'
 vector='---011000--011000-------------------'
@@ -70,7 +71,7 @@ vector='---100000--100000-------------------'
 vector='---100000--100000-------------------'
 vector='---011000--011000-------------------'
 vector='---010000--010000-------------------'
-# Testing a D inputs (U and K) set to 0V (0). The flip-flip should go into a set state.
+# Testing D inputs (U and K) set to 0V (0). The flip-flip should go into a set state.
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
 vector='---010000--010000-------------------'
 vector='---100010--100010-------------------'
