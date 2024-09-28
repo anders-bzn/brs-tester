@@ -1,0 +1,49 @@
+# Test for R111, Expandable NAND/NOT Gate
+
+# Define the limits when testing inputs
+input-current='-1.0mA'
+input-current-margin='1.0mA'
+input-active-level='high'
+input-logic-high='-300mV'
+
+# Define the limits when testing the clamped load resistors
+load-low='-3700mV'
+load-low-margin='50mV'
+load-high='-50mV'
+load-high-margin='100mV'
+load-current='-50mA'
+load-current-margin='5mA'
+
+# Define how much current the outputs can sink
+output-drive-strength='40mA'
+
+# The 'config' key describes how the tested board has it connections. 
+# 
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppii-Odii-Odii-Od------------------'
+vector='------01---01---01------------------'
+vector='---00-11---01---01------------------'
+vector='---01-11---01---01------------------'
+vector='---10-11---01---01------------------'
+vector='---11-01---01---01------------------'
+vector='------0100-11---01------------------'
+vector='------0101-11---01------------------'
+vector='------0110-11---01------------------'
+vector='------0111-01---01------------------'
+vector='------01---0100-11------------------'
+vector='------01---0101-11------------------'
+vector='------01---0110-11------------------'
+vector='------01---0111-01------------------'
+vector='---00-1100-1100-11------------------'
+vector='---01-1101-1101-11------------------'
+vector='---10-1110-1110-11------------------'
+vector='---11-0111-0111-01------------------'
