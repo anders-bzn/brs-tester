@@ -1,5 +1,5 @@
 # BRS Tester User’s Manual
-## 11-Sep-24
+## 11-6-Sep-24
 
 ![BRS tester](../photos/brs-tester.jpg)
 <div style="page-break-after: always"></div>
@@ -29,14 +29,19 @@ Table of Contents
 3.2	Raspberry Pi Installation	10
 3.3	Setting up the Raspberry Pi Software	11
 3.1	Setting up the BRS Tester Software	12
-4	Operating the Tester	12
+4.	Operating the Tester	12
 4.1	Raspberry Pi FlipChip Tester Software	12
 4.2	Tester Software Command Line Options	13
 4.3	Tester Software Command Line Examples	13
 4.4	Test Vector Files	13
-5   Golang Setup for the GUI BRS Tester
+4.4.1   Config Lines    13
+4.4.2 Vector Lines      13
+4.4.3 Input Lines       13
+4.4.4 Output Lines      13
+4.4.5 Toggles Line      13
+5.  Golang Setup for the GUI BRS Tester
 5.1 Installing the Golang Software
-6	GNU Free Documentation License	14
+6.	GNU Free Documentation License	14
 6.1.	PREAMBLE	14
 6.2.	APPLICABILITY AND DEFINITIONS	15
 6.3.	VERBATIM COPYING	16
@@ -294,12 +299,18 @@ You can connect to the Raspberry Pi through the network using a VNC Viewer or th
     --usage                Give a short usage message
 -V, --version              Print program version
 ```
+Note: If --loop=0 the Logic Test will not be performed.
 
 ## 4.3	Tester Software Command Line Examples
 
 Test that libgpiod is installed and working. You should see a long list detailing all of the Raspberry Pi GPIOs.
 ```
 $ gpioinfo
+gpiochip0 - 54 lines:
+	line   0:     "ID_SDA"       unused  output  active-high 
+	line   1:     "ID_SCL"       unused  output  active-high 
+	line   2:      "GPIO2"       unused   input  active-high 
+...
 ```
 
 Initialize the hardware.
@@ -389,18 +400,22 @@ Drive strength: 32 mA, meas: (-28.3 mA) (-387.7 mV)                    [  OK  ]
 Drive strength: 32 mA, meas: (-28.2 mA) (-384.3 mV)                    [  OK  ]
 ```
 
-Run a test on a FlipChip, and loop the logical test loop a number of times.
+Run a test on a B104 FlipChip, and execute the logical test loop 10 times.
 ```
 $ brs-tester test --vector=vectors/b104.fct --loop=10
 ```
 
-Turn on power to the test object.
-```
-$ brs-tester debug --power-enable=on
-```
+## 5. Test Vector Files
 
-## 4.4 Test Vector Files
-Test Vector files are ASCII text and can be created and edited with any text editor. An individual Test Vector file is needed for each part number FlipChip, and possibly for different revisions of FlipChips with the same part number. The Test Vector file contains several types of lines. Comment lines begin with “#”, and blank lines will be ignored. Config lines define the purpose of each pin on the FlipChip under test. Each pin in a config must be defined as one of the following:
+Test Vector files are ASCII text and can be created and edited with any text editor. An individual Test Vector file is needed for each part number FlipChip, and possibly for different revisions of FlipChips with the same part number. The back of the FlipChip printed circuit board usually includes text that describes the FlipChip's function, the part number, and the printed circuit board revision level. For example "INVERTER R107E". This FlipChip is an inverter, the part number is "R107", the printed circuit board revision is "E". There may also be a serial number and an assembly revision stamped onto the back of the plastic handle. For example "425 J". The "J" is the FlipChip assembly revision. If possible you should use a Test Vector file that matches the Assembly revision, or at least the printed circuit board revision.
+
+Test Vector files contain several types of lines that are described below.
+
+Note: Comment lines begin with “#”, and blank lines will be ignored.
+
+### 5.1. Config Line
+
+The config line define the purpose of each pin on the FlipChip under test. A single-width FlipChip uses the "A" connector. The "B" connector pins on a single-width FlipChip should be defined a "-", not uesd. Each pin in a config line must be defined as one of the following:
 ```
 'p' - power pin, do nothing
 'i' - input pin on FlipChip under test
@@ -409,14 +424,85 @@ Test Vector files are ASCII text and can be created and edited with any text edi
 'd' - pull down net on FlipChip under test
 'g' - pin should be grounded on FlipChip under test
 '-' - pin should not be used, don't care, it will be electrically disconnected
-```
+
 The sequence of pins in a config line are as follows:
-```
 Connector:	AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
 Pin:		ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config=    'pppiiOdiiOdiiOdiiO------------------'
 ```
-# 5	Golang Setup for the GUI BRS Tester
-## 5.1 Installing the Golang Software
+
+### 5.2 Vector Lines
+
+Vector lines set the state of the input pins on the FlipChip and check the expected state of the output pins. There can be multiple vector lines in a Test Vector file. The vector lines are processed in order they appear in the file from top to bottom. If a pin is configured as an input, 0, 1, and T are the valid configurations. The output pins states are checked after the state of the input pins are set. The toggling pin is useful for debugging a broken FlipChip because you can trace the toggline input through the circuitry on the FlipChip. Each pin in a vector line must be defined as one of the following:
+
+```
+'0' - An input pin is driven to ground, and an output pin is expected to be at ground
+'1' - An input pin is driven to -3V, and an output pin is expected to be at -3V
+'T' - An input pin toggled from it's current state, there can only be one toggle per vector line
+
+Connector: AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+Pin:       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+vector=   '---10---------101T------------------'
+vector=   '---01---------101T------------------'
+vector=   '---01---------01T1------------------'
+vector=   '---10---------10T1------------------'
+```
+### 5.3. Load Lines
+The load-* lines are used to define testing limits when testing load networks that are present on some FlipChips. These definitions are only used when the 'd' operator is found in the config line.
+
+```
+load-low='-3700mV'
+load-low-margin='200mV'
+load-high='-50mV'
+load-high-margin='100mV'
+load-current='-10mA'
+load-current-margin='1mA'
+```
+### 5.4. Input Lines
+The input-* keys defined testing limits for input pins.
+
+The tester measures the current with the input set to '0' and '1'. When it's '0' the input should be at ~0V. Then the diode on the input opens and current will flow. This current is measured and compared with the "input-current" value. If the difference is larger than the "input-current-margin" the test will fail. 
+
+This print the line:
+Pin: AD H voltage   -21.6 current    -1.7 [  OK  ]
+Then when '1' the voltage is -3700mV an there is no current flowing thru the diode. The the current should be ~0mA The test prints the measured voltage and current:
+Pin: AD H voltage -3691.9 current     0.0 [  OK  ]
+
+```
+input-current-low='0.0mA'
+input-current-high='-3.7mA'
+input-current-margin='1.0mA'
+input-voltage-low='-3700mV'
+input-voltage-high='-50mV'
+```
+### 5.5. Output Lines
+The output-drives-strength line defines how much current the outputs on the FlipChip can sink.
+
+```
+output-drive-strength='26mA'
+```
+### 5.6. Toggles Line
+Number of times the pin defined as "T" should toggle when the "T" function is used in the vector line.
+
+```
+toggles='1000'
+```
+
+## 6.	Troubleshooting a Failed FlipChip
+
+You can manually turn the power to the FlipChip on and off.
+```
+$ brs-tester debug --power-enable=on
+$ brs-tester debug --power-enable=off
+```
+
+The Toggle definition of a pin in a Config line can be used to flip the logic state of a pin the number of times defined in the "toggles" line. This is useful for tracing an input signal through the logic on a FlipChip.
+
+
+Output pins of FlipChips that are not Open-Collector are clamped to about -3.5V. If the tester sees an output voltage from the FlipChip that is more than -3.7V the test process will stop. 
+
+# 7.	Golang Setup for the GUI BRS Tester
+## 7.1 Installing the Golang Software
 Install Go, gcc and the graphics library header files using the package manager.
 ```
 $ sudo apt-get install golang gcc libegl1-mesa-dev xorg-dev 
@@ -428,7 +514,7 @@ $ go get fyne.io/fyne/v2@latest
 $ go install fyne.io/fyne/v2@latest
 ```
 
-# GNU Free Documentation License
+# 8. GNU Free Documentation License
 
 Version 1.3, 3 November 2008
 
@@ -438,7 +524,7 @@ Inc. <https://fsf.org/>
 Everyone is permitted to copy and distribute verbatim copies of this
 license document, but changing it is not allowed.
 
-## 0. PREAMBLE
+## 8.0. PREAMBLE
 
 The purpose of this License is to make a manual, textbook, or other
 functional and useful document "free" in the sense of freedom: to
@@ -461,7 +547,7 @@ can be used for any textual work, regardless of subject matter or
 whether it is published as a printed book. We recommend this License
 principally for works whose purpose is instruction or reference.
 
-## 1. APPLICABILITY AND DEFINITIONS
+## 8.1. APPLICABILITY AND DEFINITIONS
 
 This License applies to any manual or other work, in any medium, that
 contains a notice placed by the copyright holder saying it can be
@@ -550,7 +636,7 @@ License, but only as regards disclaiming warranties: any other
 implication that these Warranty Disclaimers may have is void and has
 no effect on the meaning of this License.
 
-## 2. VERBATIM COPYING
+## 8.2. VERBATIM COPYING
 
 You may copy and distribute the Document in any medium, either
 commercially or noncommercially, provided that this License, the
@@ -565,7 +651,7 @@ number of copies you must also follow the conditions in section 3.
 You may also lend copies, under the same conditions stated above, and
 you may publicly display copies.
 
-## 3. COPYING IN QUANTITY
+## 8.3. COPYING IN QUANTITY
 
 If you publish printed copies (or copies in media that commonly have
 printed covers) of the Document, numbering more than 100, and the
@@ -603,7 +689,7 @@ Document well before redistributing any large number of copies, to
 give them a chance to provide you with an updated version of the
 Document.
 
-## 4. MODIFICATIONS
+## 8.4. MODIFICATIONS
 
 You may copy and distribute a Modified Version of the Document under
 the conditions of sections 2 and 3 above, provided that you release
@@ -692,7 +778,7 @@ The author(s) and publisher(s) of the Document do not by this License
 give permission to use their names for publicity for or to assert or
 imply endorsement of any Modified Version.
 
-## 5. COMBINING DOCUMENTS
+## 8.5. COMBINING DOCUMENTS
 
 You may combine the Document with other documents released under this
 License, under the terms defined in section 4 above for modified
@@ -716,7 +802,7 @@ in the various original documents, forming one section Entitled
 and any sections Entitled "Dedications". You must delete all sections
 Entitled "Endorsements".
 
-## 6. COLLECTIONS OF DOCUMENTS
+## 8.6. COLLECTIONS OF DOCUMENTS
 
 You may make a collection consisting of the Document and other
 documents released under this License, and replace the individual
@@ -731,7 +817,7 @@ copy of this License into the extracted document, and follow this
 License in all other respects regarding verbatim copying of that
 document.
 
-## 7. AGGREGATION WITH INDEPENDENT WORKS
+## 8.7. AGGREGATION WITH INDEPENDENT WORKS
 
 A compilation of the Document or its derivatives with other separate
 and independent documents or works, in or on a volume of a storage or
@@ -750,7 +836,7 @@ electronic equivalent of covers if the Document is in electronic form.
 Otherwise they must appear on printed covers that bracket the whole
 aggregate.
 
-## 8. TRANSLATION
+## 8.8. TRANSLATION
 
 Translation is considered a kind of modification, so you may
 distribute translations of the Document under the terms of section 4.
@@ -770,7 +856,7 @@ If a section in the Document is Entitled "Acknowledgements",
 its Title (section 1) will typically require changing the actual
 title.
 
-## 9. TERMINATION
+## 8.9. TERMINATION
 
 You may not copy, modify, sublicense, or distribute the Document
 except as expressly provided under this License. Any attempt otherwise
@@ -797,7 +883,7 @@ this License. If your rights have been terminated and not permanently
 reinstated, receipt of a copy of some or all of the same material does
 not give you any rights to use it.
 
-## 10. FUTURE REVISIONS OF THIS LICENSE
+## 8.10. FUTURE REVISIONS OF THIS LICENSE
 
 The Free Software Foundation may publish new, revised versions of the
 GNU Free Documentation License from time to time. Such new versions
@@ -817,7 +903,7 @@ that a proxy can decide which future versions of this License can be
 used, that proxy's public statement of acceptance of a version
 permanently authorizes you to choose that version for the Document.
 
-## 11. RELICENSING
+## 8.11. RELICENSING
 
 "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
 World Wide Web server that publishes copyrightable works and also
