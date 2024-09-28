@@ -1,4 +1,5 @@
-# Test for R111, Expandable NAND/NOT Gate
+# Test for R203, triple flip-flop
+# WORK IN PROGRESS
 
 # Define the limits when testing inputs
 input-current='-1.0mA'
@@ -9,8 +10,8 @@ input-logic-high='-300mV'
 # Define how much current the outputs can sink
 output-drive-strength='20mA'
 
-# The 'config' key describes how the tested board has it connections. 
-# 
+# The 'config' key describes how the tested board has it connections.
+#
 # 'p' - power pin, do nothing
 # 'i' - input pin on tested board
 # 'o' - output pin on tested board
@@ -24,4 +25,3 @@ output-drive-strength='20mA'
 config='pppi--iii--iii--ii------------------'
 vector='---1----1----1----------------------'
 vector='---0----0----0----------------------'
-#config='pppiooiiiooiiiooii------------------'
