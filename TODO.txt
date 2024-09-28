@@ -1,9 +1,11 @@
 TODO: list of things to implement/fix
 -----------------------------------------------------------------------
 [ ] Test output drive strength
+[ ] Create pulse for B213 and others
 [ ] Allow individual configuration of electrical properties of PIN's
 [ ] Single step testing
 [ ] HALT or PAUSE when a failure occurs as option
+[ ] Test of diode boards (R002 as an example)
 [ ] Add the possibility to output a pulse from a single line in logic test
 [ ] Use the tester as DMM (measurements in a loop)
 [ ] Add design files for electronics (KiCad)
