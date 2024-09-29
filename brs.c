@@ -240,6 +240,8 @@ int main (int argc, char *argv[])
         }
 
         printf("TEST: Setup board\n");
+        printf("AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB\n");
+        printf("ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV\n");
         tests_setupBoard(board_config);
 
         printf("TEST: Check pull downs\n");
@@ -251,6 +253,8 @@ int main (int argc, char *argv[])
         printf("TEST: Check logic\n");
         while (l < args.loops) {
             int k=0;
+            printf("AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB\n");
+            printf("ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV\n");
             while(vectors[k] != NULL) {
                 tests_checkLogic(board_config, vectors[k]);
                 k++;
