@@ -12,12 +12,14 @@
 
 #include "vector.h"
 
-char *vectors[1000];
+#define MAX_VECTORS 1000
+
+struct vector vectors[MAX_VECTORS];
 
 enum check_format {
     FORMAT_CONFIG,
     FORMAT_VECTOR,
-    FORMAT_LOAD
+    FORMAT_OUTPUT
 };
 
 static int validate_format(char *str, char *cfg, enum check_format format)
@@ -34,7 +36,7 @@ static int validate_format(char *str, char *cfg, enum check_format format)
      * pin location. Toggle one pin only.
      */
     if (format == FORMAT_VECTOR){
-        for(int i=0; i < VECTOR_LENGTH - 1; i++){
+        for (int i=0; i < VECTOR_LENGTH - 1; i++){
             switch (str[i]) {
                 case '0':
                 case '1':
@@ -71,7 +73,7 @@ static int validate_format(char *str, char *cfg, enum check_format format)
      */
 
     if (format == FORMAT_CONFIG){
-        for(int i=0; i < VECTOR_LENGTH - 1; i++){
+        for (int i=0; i < VECTOR_LENGTH - 1; i++){
             switch (str[i]) {
                 case 'i':
                 case 'o':
@@ -109,15 +111,21 @@ static int validate_format(char *str, char *cfg, enum check_format format)
      * '-' - pin should not be used
      */
 
-    if (format == FORMAT_LOAD){
+    if (format == FORMAT_OUTPUT){
         if (cfg == NULL)
             return -1;
 
-        for(int i=0; i < VECTOR_LENGTH - 1; i++){
+        for (int i=0; i < VECTOR_LENGTH - 1; i++){
             if (str[i] == '-')
-                continue;;
+                continue;
 
             if (str[i] == 'L' && (cfg[i] == 'o' || cfg[i] == 'O'))
+                continue;
+
+            if ((str[i] == '0' || str[i] == '1' || str[i] == 'P')  && cfg[i] == 'i')
+                continue;
+
+            if ((str[i] == '0' || str[i] == '1')  && (cfg[i] == 'o' || cfg[i] == 'O'))
                 continue;
 
             return -1;
@@ -137,7 +145,7 @@ int vector_loadVectors(char *filename, struct config *board)
     }
 
     int k=0, i=0;
-    while (!feof(fp)) {
+    while (!feof(fp) && k < MAX_VECTORS - 1) {
         if (!fgets(str, 200, fp))
             break;
         i++;
@@ -166,21 +174,26 @@ int vector_loadVectors(char *filename, struct config *board)
             /*
              * Break if error
              */
-            vectors[k] = malloc(VECTOR_LENGTH);
-            strncpy(vectors[k], &str[8], VECTOR_LENGTH);
-            vectors[k][VECTOR_LENGTH-1] = '\0';
+            vectors[k].type = TYPE_LOGIC;
+            vectors[k].vector = malloc(VECTOR_LENGTH);
+            strncpy(vectors[k].vector, &str[8], VECTOR_LENGTH);
+            vectors[k].vector[VECTOR_LENGTH-1] = '\0';
             k++;
-            vectors[k] = NULL;
-        } else if (0 == strncmp("load=  '", str, 8)){
-            if (0 > validate_format(&str[8], board->pin_def, FORMAT_LOAD)){
+            vectors[k].vector = NULL;
+        } else if (0 == strncmp("output-drive='", str, 14)){
+            if (0 > validate_format(&str[14], board->pin_def, FORMAT_OUTPUT)){
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
             }
             /*
              * Break if error
              */
-
-            printf("LOAD string OK %s", &str[8]);
+            vectors[k].type = TYPE_OUTPUT;
+            vectors[k].vector = malloc(VECTOR_LENGTH);
+            strncpy(vectors[k].vector, &str[14], VECTOR_LENGTH);
+            vectors[k].vector[VECTOR_LENGTH-1] = '\0';
+            k++;
+            vectors[k].vector = NULL;
         } else if (0 == strncmp("load-low='", str, sizeof("load-low='")-1)) {
             float value = 0;
             int k = sscanf(str, "load-low='%fmV'", &value);
@@ -311,9 +324,9 @@ int vector_loadVectors(char *filename, struct config *board)
 void vector_freeVectors(void)
 {
     int k=0;
-    while(vectors[k] != NULL) {
-        free(vectors[k]);
-        vectors[k]  = NULL;
+    while(vectors[k].vector != NULL) {
+        free(vectors[k].vector);
+        vectors[k].vector = NULL;
         k++;
     }
 }
@@ -321,7 +334,7 @@ void vector_freeVectors(void)
 
 void vector_initVectors(void)
 {
-    memset(vectors, 0, sizeof(vectors[1000]));
+    memset(vectors, 0, sizeof(vectors[MAX_VECTORS]));
 }
 
 

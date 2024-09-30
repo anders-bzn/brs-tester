@@ -24,7 +24,17 @@ struct config {
     int     toggles;
 };
 
-extern char *vectors[];
+enum type {
+    TYPE_LOGIC,
+    TYPE_OUTPUT,
+};
+
+struct vector {
+    char *vector;
+    enum type type;
+};
+
+extern struct vector vectors[];
 
 int vector_loadVectors(char *filename, struct config *board);
 void vector_freeVectors(void);

@@ -170,13 +170,6 @@ int tests_selfTest(void)
 }
 
 
-/*
- * Must add:
- * Electrical test of outputs
- *
- */
-
-
 int tests_setupBoard(struct config const *b_cfg)
 {
     char const *str = b_cfg->pin_def;
@@ -491,6 +484,13 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
         }
     }
     printf("      [ %s ] \n", test_failed ? "FAIL" : " OK ");
+    return 0;
+}
+
+
+int tests_checkDriveStrength(struct config const *b_cfg, char *vector)
+{
+    printf("%s\n", vector);
     return 0;
 }
 

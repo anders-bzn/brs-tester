@@ -255,11 +255,23 @@ int main (int argc, char *argv[])
             int k=0;
             printf("AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB\n");
             printf("ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV\n");
-            while(vectors[k] != NULL) {
-                tests_checkLogic(board_config, vectors[k]);
+            while(vectors[k].vector != NULL) {
+                if  (vectors[k].type == TYPE_LOGIC) {
+                    tests_checkLogic(board_config, vectors[k].vector);
+                }
                 k++;
             }
             l++;
+        }
+
+        printf("\n");
+        printf("TEST: Check drive strength\n");
+        int k=0;
+        while(vectors[k].vector != NULL) {
+            if  (vectors[k].type == TYPE_OUTPUT) {
+                tests_checkDriveStrength(board_config, vectors[k].vector);
+            }
+            k++;
         }
 
         hal_powerEnable(0);
