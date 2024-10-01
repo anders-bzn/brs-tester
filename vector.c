@@ -302,6 +302,24 @@ int vector_loadVectors(char *filename, struct config *board)
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
             }
+        } else if (0 == strncmp("output-voltage-high='", str, sizeof("output-voltage-high='")-1)) {
+            float value = 0;
+            int k = sscanf(str, "output-voltage-high='%fmV'", &value);
+            if (k == 1) {
+                board->output_voltage_high = value;
+            } else {
+                printf("ERROR: Error parse file line %d: %s\n", i, str);
+                return -1;
+            }
+        } else if (0 == strncmp("output-voltage-margin='", str, sizeof("output-voltage-margin='")-1)) {
+            float value = 0;
+            int k = sscanf(str, "output-voltage-margin='%fmV'", &value);
+            if (k == 1) {
+                board->output_voltage_margin = value;
+            } else {
+                printf("ERROR: Error parse file line %d: %s\n", i, str);
+                return -1;
+            }
         } else if (0 == strncmp("toggles='", str, sizeof("toggles='")-1)) {
             int k, toggles = 0;
             k = sscanf(str, "toggles='%d'", &toggles);
