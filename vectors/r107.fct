@@ -19,9 +19,11 @@ input-voltage-high='-50mV'
 
 # Define how much current the outputs can sink
 output-drive-strength='18mA'
+output-voltage-high='-100mV'
+output-voltage-margin='100mV'
 
-# The 'config' key describes how the tested board has it connections. 
-# 
+# The 'config' key describes how the tested board has it connections.
+#
 # 'p' - power pin, do nothing
 # 'i' - input pin on tested board
 # 'o' - output pin on tested board
@@ -57,3 +59,9 @@ vector='---01010101010101-------------------'
 vector='---10101010101010-------------------'
 # Float the inputs and check that the outputs are a logic 0
 vector='---0-0-0-0-0-0-0--------------------'
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#            'pppoioioioioioioi-------------------'
+output-drive='---01010101010101-------------------'
+output-drive='---L-L-L-L-L-L-L--------------------'
