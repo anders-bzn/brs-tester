@@ -609,7 +609,7 @@ int tests_checkInputs(struct config const *b_cfg)
             /*
              * Set inactive level on all inputs
              */
-            pin_setDataOut(pin, 0);
+            pin_setDataOut(pin, 1);
         }
     }
 
