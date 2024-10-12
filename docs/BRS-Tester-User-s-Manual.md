@@ -1,5 +1,5 @@
 # BRS Tester User’s Manual
-## 11-6-Sep-24
+## 11-Oct-24
 
 ![BRS tester](../photos/brs-tester.jpg)
 <div style="page-break-after: always"></div>
@@ -10,57 +10,60 @@ Permission is granted to copy, distribute and/or modify this document under the 
 A copy of the license is included in the section entitled "GNU Free Documentation License".
 ``` 
 Table of Contents
-1.	Introduction	4
-2.	Theory of Operation	5
-2.1.	Backplane Board	5
-2.1.1.	Power Circuitry	5
-2.1.2.	Output Selection Decoder	5
-2.1.3.	Measurement and ADC Circuit	5
-2.1.4	Input Latch Circuit	6
-2.2.	Raspberry Pi	6
-2.2.	PSU Board	7
-2.2.1.	PSU Board Operation	7
-2.2.2.	Level Converter Board Operation	7
-2.2.3.	Level Converter Board Connections	8
-2.3.	Load Board	9
-2.3.1.	Load Board Operation	10
-3.	Tester Setup	10
-3.1	Power Supply Connections	10
-3.2	Raspberry Pi Installation	10
-3.3	Setting up the Raspberry Pi Software	11
-3.1	Setting up the BRS Tester Software	12
-4.	Operating the Tester	12
-4.1	Raspberry Pi FlipChip Tester Software	12
-4.2	Tester Software Command Line Options	13
-4.3	Tester Software Command Line Examples	13
-4.4	Test Vector Files	13
-4.4.1   Config Lines    13
-4.4.2 Vector Lines      13
-4.4.3 Input Lines       13
-4.4.4 Output Lines      13
-4.4.5 Toggles Line      13
-5.  Golang Setup for the GUI BRS Tester
-5.1 Installing the Golang Software
-6.	GNU Free Documentation License	14
-6.1.	PREAMBLE	14
-6.2.	APPLICABILITY AND DEFINITIONS	15
-6.3.	VERBATIM COPYING	16
-6.4.	COPYING IN QUANTITY	17
-6.5.	MODIFICATIONS	17
-6.6.	COMBINING DOCUMENTS	19
-6.7.	COLLECTIONS OF DOCUMENTS	20
-6.8.	AGGREGATION WITH INDEPENDENT WORKS	20
-6.9.	TRANSLATION	21
-6.10.	TERMINATION	21
-6.11.	FUTURE REVISIONS OF THIS LICENSE	22
-6.12.	RELICENSING	22
+1.	Introduction
+2.	Theory of Operation
+2.1.	Backplane Board
+2.1.1.	Power Circuitry
+2.1.2.	Output Selection Decoder
+2.1.3.	Measurement and ADC Circuit
+2.1.4	Input Latch Circuit
+2.2.	Raspberry Pi
+2.2.	PSU Board
+2.2.1.	PSU Board Operation
+2.2.2.	Level Converter Board Operation
+2.2.3.	Level Converter Board Connections
+2.3.	Load Board
+2.3.1.	Load Board Operation
+3.	Tester Setup
+3.1.	Power Supply Connections
+3.2.	Raspberry Pi Installation
+3.3.	Setting up the Raspberry Pi Software
+3.1.	Setting up the BRS Tester Software
+4.	Operating the Tester
+4.1.	Raspberry Pi FlipChip Tester Software
+4.2.	Tester Software Command Line Options
+4.3.	Tester Software Command Line Examples
+5.	Test Vector Files
+5.1.    Config Lines
+5.2.    Vector Lines
+5.3.    Load Lines
+5.4.    Input Lines
+5.5.    Output Lines
+5.6.    Toggles Line
+5.7.    Output Drive
+6. Troubleshooting a Failed FlipChip
+7.  Golang Setup for the GUI BRS Tester
+7.1.    Installing the Golang Software
+8.	GNU Free Documentation License
+8.1.	PREAMBLE
+8.2.	APPLICABILITY AND DEFINITIONS
+8.3.	VERBATIM COPYING
+8.4.	COPYING IN QUANTITY
+8.5.	MODIFICATIONS
+8.6.	COMBINING DOCUMENTS
+8.7.	COLLECTIONS OF DOCUMENTS
+8.8.	AGGREGATION WITH INDEPENDENT WORKS
+8.9.	TRANSLATION
+8.10.	TERMINATION
+8.11.	FUTURE REVISIONS OF THIS LICENSE
+8.12.	RELICENSING
 ```
 <div style="page-break-after: always"></div>
 
 # 1.	Introduction
 This project implements a tester for the Digital Equipment B/R/S series of FlipChips. These FlipChips are used in the PDP-7, PDP-8 Classic, PDP-8/S, PDP-9 and in the PDP-10 with KA processor. B/R/S FlipChips are implemented with discrete transistors and diodes, and do not use integrated circuits. B/R/S FlipChips use 0V / -3V volts for logic levels. Depending on how a  B/R/S FlipChip is used in the circuit either 0V or -3V can be a logic 1. An adapter for the DEC System Modules used in earlier systems is under development.\
 
-Since the B/R/S FlipChips use just transistors and diodes there are many easy to detect faults where a transistor or diode is either shorted or open. There are also many more difficult to find faults where transistor or diode is partially shorted, or a transistor has low gain or high leakage. For these reasons the BRS Tester is significantly more complicated than the M series FlipChip tester that Warren Stearns designed.\
+Since the B/R/S FlipChips use just transistors and diodes there are many easy to detect faults where a transistor or diode is either shorted or open. There are also many more difficult to find faults where transistor or diode is partially shorted, or a transistor has low gain or high leakage. For these reasons the BRS Tester is significantly more complicated than the M series FlipChip tester that Warren Stearns designed.
 
 The FlipChip Tester software running on the Raspberry Pi reads a test vector file that corresponds to a particular FlipChip. The test vector file contains configuration lines that specify the function of each pin, the load circuit connected to each pin on the FlipChip, the input signal margins, the amount of current used to drive a pin on the FlipChip, and the number of times to loop through the test. The test vector file also contains test vectors that specify the signals sent to the FlipChip and the expected signal response. The FlipChip Tester software processes each test vector and reports any cases where the expected response was not correct.\
 
@@ -78,9 +81,9 @@ The +10V from the PSU Board is fused at 250mA, then switched and used on the Fli
 The Output Selection Decoder circuit allows the Tester Software running on the Raspberry Pi to select the Load board, or one of the Level Converter Boards. The SELECT_A, SELECT_B, SELECT_C, and SELECT_D signals from the Raspberry Pi are connected to two 74LVC138 3-Line to 8-Line Decoders Demultiplexers that generate 16 possible Output Selection signals. The /SELECT_OUT signal from the Raspberry Pi enables the Output Selection Signal. One Output Selection signal is connected to the Load Board, and 15 are connected individually to the Level Converter Boards.
 
 ### 2.1.3.	Measurement and ADC Circuit
-The Measurement and ADC Circuit is powered by +15V/-15V and +3V3 from the PSU board. The ADC is used to measure the Current (AIN0) and Voltage (AIN1) signals, and a 1.706V ADC reverence voltage signal (AIN3). The ADC input AIN2 is currently unused.\
+The Measurement and ADC Circuit is powered by +15V/-15V and +3V3 from the PSU board. The ADC is used to measure the Current (AIN0) and Voltage (AIN1) signals, and a 1.706V ADC reverence voltage signal (AIN3). The ADC input AIN2 is currently unused.
 
-The Level Converter and Load boards are connected to the Measurement Bus using the MEAS1 Voltage signal and the MEAS2 Current signal. The Measurement Bus Voltage signal is also available on the BNC connector X1 so that it can be connected to an oscilloscope. Operational Amplifiers are used to buffer the Measurement Bus signals which are then connected to an ADS1115 ADC (IC9). The ADC is connected to the Raspberry Pi through the I<sup>2</sup>C bus.
+The Level Converter and Load boards are connected to the Measurement Bus using the MEAS1 Voltage signal and the MEAS2 Current signal. A 10 Ohm resistor on the Level Converter boards is used to create a voltage offset so that current through the resistor can be calculated. The Measurement Bus Voltage signal is also available on the BNC connector X1 so that it can be connected to an oscilloscope. Operational Amplifiers are used to buffer the Measurement Bus signals which are then connected to an ADS1115 ADC (IC9). The ADC is connected to the Raspberry Pi through the I<sup>2</sup>C bus.
 
 ### 2.1.4.	Input Latch Circuit
 Four 74LVC573 Octal Transparent D-Type Latches capture the D_IN1 and D_IN2 signal state from the 15 Level Converter Boards when the LATCH_IN signal from the Raspberry Pi goes active. When the INP_A, INP_B, INP_C, or INP_D signal from the Raspberry Pi goes active the data stored in the latch is sent to the Digital Data Bus that is connected to the Raspberry Pi.
@@ -433,7 +436,7 @@ config=    'pppiiOdiiOdiiOdiiO------------------'
 
 ### 5.2 Vector Lines
 
-Vector lines set the state of the input pins on the FlipChip and check the expected state of the output pins. There can be multiple vector lines in a Test Vector file. The vector lines are processed in order they appear in the file from top to bottom. If a pin is configured as an input, 0, 1, and T are the valid configurations. The output pins states are checked after the state of the input pins are set. The toggling pin is useful for debugging a broken FlipChip because you can trace the toggline input through the circuitry on the FlipChip. Each pin in a vector line must be defined as one of the following:
+Vector lines set the state of the input pins on the FlipChip and check the expected state of the output pins. There can be multiple vector lines in a Test Vector file. The vector lines are processed in order they appear in the file from top to bottom. If a pin is configured as an input, 0, 1, and T are the only valid configurations. The output pins states are checked after the state of the input pins are set. Toggling a pin is useful for debugging a broken FlipChip because you can trace the toggling input through the circuitry on the FlipChip. Each pin in a vector line must be defined as one of the following:
 
 ```
 '0' - An input pin is driven to ground, and an output pin is expected to be at ground
@@ -461,13 +464,9 @@ load-current-margin='1mA'
 ### 5.4. Input Lines
 The input-* keys defined testing limits for input pins.
 
-The tester measures the current with the input set to '0' and '1'. When it's '0' the input should be at ~0V. Then the diode on the input opens and current will flow. This current is measured and compared with the "input-current" value. If the difference is larger than the "input-current-margin" the test will fail. 
+The tester measures the current with the input set to '0' and '1'. When it's '0' the input should be at ~0V. Then the diode on the input pin opens and current will flow. This current is measured and compared with the "input-current" value. If the difference is larger than the "input-current-margin" the test will fail.
 
-This print the line:
-Pin: AD H voltage   -21.6 current    -1.7 [  OK  ]
-Then when '1' the voltage is -3700mV an there is no current flowing thru the diode. The the current should be ~0mA The test prints the measured voltage and current:
-Pin: AD H voltage -3691.9 current     0.0 [  OK  ]
-
+These configuration settings refer to the voltage on the input pin, not the logic state.
 ```
 input-current-low='0.0mA'
 input-current-high='-3.7mA'
@@ -475,19 +474,55 @@ input-current-margin='1.0mA'
 input-voltage-low='-3700mV'
 input-voltage-high='-50mV'
 ```
+This example line from the tester output shows that the input pin was driven to a '0' and the resulting voltage on the pin was -21.6mV and the pin was sinking 1.7mA at the time.
+```
+Pin: AD H voltage   -21.6 current    -1.7 [  OK  ]
+```
+Then the tester drove the input pin to a '1' and the the resulting voltage on the pin was -3700mV and there is no current flowing thru the pin.
+```
+Pin: AD H voltage -3691.9 current     0.0 [  OK  ]
+```
 ### 5.5. Output Lines
 The output-drives-strength line defines how much current the outputs on the FlipChip can sink.
-
 ```
 output-drive-strength='26mA'
 ```
 ### 5.6. Toggles Line
 Number of times the pin defined as "T" should toggle when the "T" function is used in the vector line.
-
 ```
 toggles='1000'
 ```
+### 5.7. Output Drive
+Define output testing. One line to set inputs so that the outputs are "0".
+Outputs can only be loaded to -3V. The output value is not used but can be
+useful. The L defines which outputs that should be tested. They can be on
+a single line but can also be on several rows.
 
+```
+Connector: AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+Pin:       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+          'pppoioioioioioioi-------------------'
+output-drive='---01010101010101-------------------'
+output-drive='---L-L------------------------------'
+output-drive='---10100101010101-------------------'
+output-drive='-------L-L-L------------------------'
+output-drive='----1-1-1-1-1-1-1-------------------'
+output-drive='-------------L-L--------------------'
+output-drive='----1-1-1-1-1-1-1-------------------'
+output-drive='---L-L-L-L-L-L-L--------------------'
+```
+output-drives-strength defines how much current the outputs can sink. This is a value is what
+the tester will load the output with.
+```
+output-drive-strength='26mA'
+```
+Those two values will define the voltage drop over the transistor compared top ground. First
+the nominal value and then a margin that defines how much the value could diff from that.
+In this example the drop might be ok if it in between 0 .. -200mV. -100 mV +/-100mV
+```
+output-voltage-high='-100mV'
+output-voltage-margin='100mV'
+```
 ## 6.	Troubleshooting a Failed FlipChip
 
 You can manually turn the power to the FlipChip on and off.
