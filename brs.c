@@ -271,6 +271,9 @@ int main (int argc, char *argv[])
             if  (vectors[k].type == TYPE_OUTPUT) {
                 tests_checkDriveStrength(board_config, vectors[k].vector);
             }
+	    if (vectors[k].type == TYPE_DEBUG_EXIT) {
+	      return 0;
+	    }
             k++;
         }
 

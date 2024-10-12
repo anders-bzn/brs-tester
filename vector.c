@@ -329,6 +329,10 @@ int vector_loadVectors(char *filename, struct config *board)
                 printf("ERROR: Error parse file line %d: %s\n", i, str);
                 return -1;
             }
+	} else if (0 == strncmp("debug-exit", str, sizeof("debug-exit")-1))  {
+            vectors[k].type = TYPE_DEBUG_EXIT;
+            k++;
+            vectors[k].vector = NULL;	    
         } else {
             printf("ERROR: Error parse file line %d: %s\n", i, str);
             return -1;

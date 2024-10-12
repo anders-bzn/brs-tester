@@ -29,6 +29,7 @@ struct config {
 enum type {
     TYPE_LOGIC,
     TYPE_OUTPUT,
+    TYPE_DEBUG_EXIT
 };
 
 struct vector {
