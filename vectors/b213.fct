@@ -91,3 +91,19 @@ vector='---010001--010001-------------------'
 vector='---010001--010001-------------------'
 vector='---010011--010011-------------------'
 vector='---010001--010001-------------------'
+
+
+# output-drives-strength defines how much current the outputs can sink. This is a value is what
+# the tester will load the output with.
+output-drive-strength='20mA'
+
+# Those two values will define the voltage drop over the transistor compared top ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+# In this example the drop might be ok if it in between 0 .. -200mV. -100 mV +/-100mV
+output-voltage-high='0mV'
+output-voltage-margin='300mV'
+
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+output-drive='---L--------------------------------'
+output-drive='-----------L------------------------'
+debug-exit
