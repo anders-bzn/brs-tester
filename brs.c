@@ -50,11 +50,12 @@ static char doc[] =
 
 /* The options we understand. */
 static struct argp_option options[] = {
-    {"vector",       'v', "FILE",   OPTION_ARG_OPTIONAL, "Test vector to run [test]"},
-    {"loop",         'l', "NUMBER", OPTION_ARG_OPTIONAL, "Number of iterations, doing loop testing [test]"},
-    {"power-enable", 'P', "on/off", OPTION_ARG_OPTIONAL, "Manual power control [debug]"},
-    {"pin",          'p', "PIN",    OPTION_ARG_OPTIONAL, "Manual pin manipulation [debug]"},
-    {"pin-state",    's', "1/0/T",  OPTION_ARG_OPTIONAL, "Manual pin state [debug]"},
+    {"vector",       'v', "FILE",     OPTION_ARG_OPTIONAL, "Test vector to run [test]"},
+    {"loop",         'l', "NUMBER",   OPTION_ARG_OPTIONAL, "Number of iterations, doing loop testing [test]"},
+    {"power-enable", 'P', "on/off",   OPTION_ARG_OPTIONAL, "Manual power control [debug]"},
+    {"pin",          'p', "PIN",      OPTION_ARG_OPTIONAL, "Manual pin manipulation [debug]"},
+    {"pin-state",    's', "1/0/T/L",  OPTION_ARG_OPTIONAL, "Manual pin state [debug]"},
+    {"load",         'L', "NUMBER",   OPTION_ARG_OPTIONAL, "Manual setting load on a pin [debug]"},
     { 0 }
 };
 
@@ -67,6 +68,7 @@ struct argp_arguments
     char pinstate;
     int pin;
     enum pwr power;
+    int output_drive_strength;
     int loops;
 };
 
@@ -91,6 +93,13 @@ parse_opt (int key, char *arg, struct argp_state *state)
             return ARGP_ERR_UNKNOWN;
         }
         break;
+    case 'L':
+        if (arg != NULL) {
+            arguments->output_drive_strength = atoi(arg);
+        } else {
+            argp_usage(state);
+            return ARGP_ERR_UNKNOWN;
+        }
     case 'P':
         if (arg != NULL && ((0 == strncmp(arg, "on", sizeof("on") -1)))) {
             arguments->power = PWR_ENABLE;
@@ -119,7 +128,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
         }
         break;
     case 's':
-        if (arg != NULL && (arg[0] == '0' || arg[0] == '1' || arg[0] == 'T')) {
+        if (arg != NULL && (arg[0] == '0' || arg[0] == '1' || arg[0] == 'T' || arg[0] == 'L')) {
             arguments->pinstate = arg[0];
         } else {
             argp_usage (state);
@@ -173,6 +182,7 @@ int main (int argc, char *argv[])
     args.power = PWR_NONE;
     args.pin = -1;
     args.pinstate = '\0';
+    args.output_drive_strength = 20;
 
     vector_initVectors();
 
@@ -243,7 +253,6 @@ int main (int argc, char *argv[])
         printf("AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB\n");
         printf("ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV\n");
         tests_setupBoard(board_config);
-
         printf("TEST: Check pull downs\n");
         tests_checkPullDown(board_config);
 
@@ -271,9 +280,9 @@ int main (int argc, char *argv[])
             if  (vectors[k].type == TYPE_OUTPUT) {
                 tests_checkDriveStrength(board_config, vectors[k].vector);
             }
-	    if (vectors[k].type == TYPE_DEBUG_EXIT) {
-	      return 0;
-	    }
+            if (vectors[k].type == TYPE_DEBUG_EXIT) {
+                return 0;
+            }
             k++;
         }
 
@@ -285,35 +294,34 @@ int main (int argc, char *argv[])
     }
 
     if (args.command == CMD_DEBUG) {
+        if (hal_setup() < 0) {
+            printf("ERROR: hal_setup() failed\n");
+            return -1;
+        } 
+        hal_setDefault();
         if (args.power != PWR_NONE) {
             int power = 0;
 
-            if (args.power == PWR_ENABLE)
-                power = 1;
-
-            if (hal_setup() < 0) {
-                    printf("ERROR: hal_setup() failed\n");
-                    return -1;
-            }
-            hal_setDefault();
+            if (args.power == PWR_ENABLE) power = 1;
             hal_powerEnable(power);
-            hal_teardown();
         }
 
         if (args.pin != -1 && args.pinstate != '\0') {
             printf("Pin set '%c' %d\n", args.pinstate, args.pin);
-            hal_setDefault();
             pin_setFunction(args.pin, PIN_OUTPUT);
             pin_setMeasure(args.pin, 1);
 
-            if (args.pinstate == 'T') {
+           if (args.pinstate == 'T') {
                 pin_toggleData(args.pin, args.loops);
             } else if (args.pinstate == '1') {
                 pin_setDataOut(args.pin, 1);
             } else if (args.pinstate == '0') {
                 pin_setDataOut(args.pin, 0);
+            } else if (args.pinstate == 'L') {
+                hal_enableLoad(args.output_drive_strength);
             }
         }
+        hal_teardown();
     }
     return 0;
 }
