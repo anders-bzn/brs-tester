@@ -116,10 +116,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
             if (pin == -1 || pin == 0 || pin == 1 || pin == 2 ||
                 pin == 18 || pin == 19 || pin == 20){
-                    printf("ERROR: Invalid pin: %s\n", arg);
-                    argp_usage (state);
-                    return ARGP_ERR_UNKNOWN;
-            } else {
+                printf("ERROR: Invalid pin: %s\n", arg);
+                argp_usage (state);
+                return ARGP_ERR_UNKNOWN;
+        } else {
                 arguments->pin = pin;
             }
         } else {
@@ -213,7 +213,7 @@ int main (int argc, char *argv[])
         hal_powerEnable(0);
         hal_teardown();
         return 0;
-     }
+    }
 
     if (args.command == CMD_TEST) {
         struct config *board_config = vector_allocConfig();
@@ -297,7 +297,7 @@ int main (int argc, char *argv[])
         if (hal_setup() < 0) {
             printf("ERROR: hal_setup() failed\n");
             return -1;
-        } 
+        }
         hal_setDefault();
         if (args.power != PWR_NONE) {
             int power = 0;
