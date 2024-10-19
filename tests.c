@@ -523,13 +523,14 @@ int tests_checkDriveStrength(struct config const *b_cfg, char *vector)
              */
             if (vector[pin] == 'P') {
                 // Handle later, no Pulse function yet.
-            } else {
-                pin_setDataOut(pin, vector[pin] - '0');
+            } else if (vector[pin] != '-') {
+              pin_setDataOut(pin, vector[pin] - '0');
             }
             break;
         case 'o':
         case 'O':
             if (vector[pin] == 'L') {
+                pin_enablePullDown(pin, 0);
                 pin_setMeasure(pin, 1);
                 usleep(100000);
                 hal_measureVoltage(&voltage1);
