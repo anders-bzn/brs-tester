@@ -22,3 +22,12 @@ input-current-margin='0.3mA'
 input-voltage-low='-3700mV'
 input-voltage-high='-10mV'
 output-drive-strength='26mA'
+output-voltage-high='-150mV'
+output-voltage-margin='150mV'
+
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#             pppiOdiOdiOdiOdiOd------------------
+output-drive='---10-10-10-10-10-------------------'
+output-drive='----L--L--L--L--L-------------------'
