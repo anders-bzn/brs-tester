@@ -88,10 +88,10 @@ int tests_selfTest(void)
             /*
              * Test to measure with load (check measurement resistance)
              */
-            hal_enableLoad(4);
+            hal_enableLoad(4, true);
             usleep(10000);
             hal_measureCurrent (&current);
-            hal_enableLoad(0);
+            hal_enableLoad(0, false);
 
             if ( fabs(voltage_l) < 10.0 && fabs(voltage_h + 3700.0 ) < 50.0) {
                 voltage_ok = 1;
@@ -128,7 +128,7 @@ int tests_selfTest(void)
          */
         const float currents[] = {-1.9, -3.9, -7.7, -15.0, -28.2, -50.2};
 
-        hal_enableLoad(curr);
+        hal_enableLoad(curr, true);
         usleep(10000);
         hal_measureCurrent (&current);
         current_error = fabs(currents[i] - current);
@@ -148,7 +148,7 @@ int tests_selfTest(void)
     /*
      * Test drive strength
      */
-    hal_enableLoad(32);
+    hal_enableLoad(32, true);
 
     for (int pin = AD; pin < LAST_PIN; pin++) {
         float current, voltage;
@@ -173,7 +173,7 @@ int tests_selfTest(void)
         pin_setMeasure(pin, 0);
         pin_setFunction(pin, PIN_DISABLED);
     }
-    hal_enableLoad(0);
+    hal_enableLoad(0, false);
     hal_setDefault();
     hal_powerEnable(0);
     return 0;
@@ -553,7 +553,7 @@ int tests_checkDriveStrength(struct config const *b_cfg, char *vector, bool sing
                     /*
                     * Here, enable dummy load
                     */
-                    hal_enableLoad(testCurrent);
+                    hal_enableLoad(testCurrent, true);
                     usleep(200000);
                     hal_measureVoltage(&voltage);
 
@@ -581,7 +581,7 @@ int tests_checkDriveStrength(struct config const *b_cfg, char *vector, bool sing
                 if (setup[pin] == 'O') {
                     pin_enablePullDown(pin, 1);
                 }
-                hal_enableLoad(0);
+                hal_enableLoad(0, false);
                 pin_setMeasure(pin, 0);
             }
             break;

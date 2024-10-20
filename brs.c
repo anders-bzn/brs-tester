@@ -324,7 +324,7 @@ int main (int argc, char *argv[])
             } else if (args.pinstate == '0') {
                 pin_setDataOut(args.pin, 0);
             } else if (args.pinstate == 'L') {
-                hal_enableLoad(args.output_drive_strength);
+                hal_enableLoad(args.output_drive_strength, true);
             }
         }
         hal_teardown();

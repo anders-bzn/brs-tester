@@ -1049,7 +1049,7 @@ int hal_setDefault(void)
  * from 0 to 126mA. Where 0 is disable. This can be used to verify drive
  * strength of output transistors on flipchips.
  */
-int hal_enableLoad(int current)
+int hal_enableLoad(int current, bool relayOn)
 {
     int retVal = 0;
 
@@ -1058,8 +1058,8 @@ int hal_enableLoad(int current)
         return -1;
     }
 
-    boards[LOAD_BOARD_ADR].data.load.enable = (current == 0) ? 0 : 1;
-    boards[LOAD_BOARD_ADR].data.load.current = current >> 1;
+    boards[LOAD_BOARD_ADR].data.load.enable = relayOn;
+    boards[LOAD_BOARD_ADR].data.load.current = (current >> 1) & 0x3f        ;
     retVal = setOut(boards[LOAD_BOARD_ADR].address, boards[LOAD_BOARD_ADR].data.data);
     return retVal;
 }
