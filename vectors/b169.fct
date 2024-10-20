@@ -1,0 +1,100 @@
+# B169 Diode gate
+# 
+#
+# First, every line starting with a '#' will be treated as a comment line
+# Blank lines will also be skipped.
+
+# Those two following lines are just helpers to make it easier to configure the right pin.
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppOOiiiiigiiiiiii------------------'
+
+vector='---1100000-0000000------------------'
+vector='---1100000-0000001------------------'
+vector='---1100000-0000010------------------'
+vector='---1100000-0000011------------------'
+vector='---1100000-0000100------------------'
+vector='---0100000-0000101------------------'
+vector='---1000000-0000110------------------'
+vector='---0000000-0000111------------------'
+vector='---1100000-0001000------------------'
+vector='---1100000-0010000------------------'
+vector='---1100000-0011000------------------'
+vector='---1100000-0100000------------------'
+vector='---0100000-0101000------------------'
+vector='---1000000-0110000------------------'
+vector='---0000000-0111000------------------'
+vector='---1100000-1000000------------------'
+vector='---1100001-0000000------------------'
+vector='---1100001-1000000------------------'
+vector='---1100010-0000000------------------'
+vector='---0100010-1000000------------------'
+vector='---1000011-0000000------------------'
+vector='---0000011-1000000------------------'
+vector='---1100100-0000000------------------'
+vector='---1101000-0000000------------------'
+vector='---1101100-0000000------------------'
+vector='---1110000-0000000------------------'
+vector='---0110100-0000000------------------'
+vector='---1011000-0000000------------------'
+vector='---0011100-0000000------------------'
+vector='---1100100-1001001------------------'
+vector='---1101001-0010010------------------'
+vector='---1101101-1011011------------------'
+vector='---1110010-0100100------------------'
+vector='---0110110-1101101------------------'
+vector='---1011011-0110110------------------'
+vector='---0011111-1111111------------------'
+# load-* keys are used to define limit values for tests of load networks
+# present on some boards. Used when the 'd' operator is found in the config string.
+load-low='-3700mV'
+load-low-margin='200mV'
+load-high='-50mV'
+load-high-margin='100mV'
+load-current='-10mA'
+load-current-margin='1mA'
+
+# input-* keys defined limits when testing inputs
+input-current-margin='2.0mA'
+
+# For a digital '0'
+input-voltage-high='-10mV'
+input-current-high='-2.0mA'
+
+# For a digital '1'
+input-voltage-low='-3700mV'
+input-current-low='0mA'
+
+# Number of times a pin should toggle when the 'T' function is used in the vector string.
+toggles='1000'
+
+# Define output testing. One line to set inputs so that the outputs are "0".
+# Outputs can only be loaded to -3V. The output value is not used but can be
+# useful. The L defines which outputs that should be tested. They can be on
+# a single line but can also be on several rows.
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#            'pppOOiiiiigiiiiiii------------------'
+output-drive='---LL11111-1111111------------------'
+
+# output-drives-strength defines how much current the outputs can sink. This is a value is what
+# the tester will load the output with.
+output-drive-strength='16mA'
+
+# Those two values will define the voltage drop over the transistor compared top ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+# In this example the drop might be ok if it in between 0 .. -300mV. -150 mV +/-150mV
+output-voltage-high='-150mV'
+output-voltage-margin='150mV'
