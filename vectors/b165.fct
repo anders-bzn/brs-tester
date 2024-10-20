@@ -29,5 +29,8 @@ output-voltage-margin='150mV'
 #             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
 #             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
 #             pppiOdiOdiOdiOdiOd------------------
-output-drive='---10-10-10-10-10-------------------'
-output-drive='----L--L--L--L--L-------------------'
+output-drive='---1L-------------------------------'
+output-drive='------1L----------------------------'
+output-drive='---------1L-------------------------'
+output-drive='------------1L----------------------'
+output-drive='---------------1L-------------------'
