@@ -56,7 +56,7 @@ static struct argp_option options[] = {
     {"pin",          'p', "PIN",      OPTION_ARG_OPTIONAL, "Manual pin manipulation [debug]"},
     {"pin-state",    's', "1/0/T/L",  OPTION_ARG_OPTIONAL, "Manual pin state [debug]"},
     {"load",         'L', "NUMBER",   OPTION_ARG_OPTIONAL, "Manual setting load on a pin [debug]"},
-    {"sigle-step",   'S', "",         OPTION_ARG_OPTIONAL, "Wait for user input before next test step"},
+    {"single-step",  'S', "",         OPTION_ARG_OPTIONAL, "Wait for user input before next test step"},
     { 0 }
 };
 
