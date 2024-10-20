@@ -492,7 +492,7 @@ int tests_checkDriveStrength(struct config const *b_cfg, char *vector)
 {
     printf("%s\n", vector);
 
-    float voltage1, voltage2;
+    float voltage;
     char *pinName;
     char const *setup = b_cfg->pin_def;
     bool test_run = false;
@@ -523,56 +523,53 @@ int tests_checkDriveStrength(struct config const *b_cfg, char *vector)
              */
             if (vector[pin] == 'P') {
                 // Handle later, no Pulse function yet.
-            } else {
+            } else if (vector[pin] != '-') {
                 pin_setDataOut(pin, vector[pin] - '0');
             }
             break;
         case 'o':
         case 'O':
             if (vector[pin] == 'L') {
+            int testCurrent = 0;
                 pin_setMeasure(pin, 1);
-                usleep(100000);
-                hal_measureVoltage(&voltage1);
-
-                /*
-                 * Here, enable dummy load
-                 */
-                hal_enableLoad(b_cfg->output_drive_strength);
-                usleep(200000);
-                hal_measureVoltage(&voltage2);
-                hal_enableLoad(0);
-                usleep(100);
-                pin_setMeasure(pin, 0);
                 pin_getName(pin, &pinName);
+                pin_enablePullDown(pin, 0);
 
-                if (fabs(voltage1 - b_cfg->output_voltage_high) > b_cfg->output_voltage_margin){
-                    result = false;
-                } else {
-                    result = true;
-                }
+                do {
+                    /*
+                    * Here, enable dummy load
+                    */
+                    hal_enableLoad(testCurrent);
+                    usleep(200000);
+                    hal_measureVoltage(&voltage);
 
-                /*
-                 * Do some limit testing. Compare voltage
-                 */
-                printf("Pin %s %3d mA  voltage %7.1f mV         [ %s ]\n", pinName,
-                                                                           0,
-                                                                           voltage1,
-                                                                           result ? " ok " : "fail");
+                    if (fabs(voltage - b_cfg->output_voltage_high) > b_cfg->output_voltage_margin){
+                        result = false;
+                    } else {
+                        result = true;
+                    }
 
-                if (fabs(voltage2 - b_cfg->output_voltage_high) > b_cfg->output_voltage_margin){
-                    result = false;
-                } else {
-                    result = true;
-                }
+                    /*
+                    * Do some limit testing. Compare voltage
+                    */
+                    printf("Pin %s %3d mA  voltage %7.1f mV         [ %s ]\n", pinName,
+                                                                               testCurrent,
+                                                                               voltage,
+                                                                               result ? " ok " : "fail");
 
-                printf("Pin %s %3d mA  voltage %7.1f mV         [ %s ]\n", pinName,
-                                                                           b_cfg->output_drive_strength,
-                                                                           voltage2,
-                                                                           result ? " ok " : "fail");
+                    testCurrent += b_cfg->output_drive_strength;
+                            } while (testCurrent <= b_cfg->output_drive_strength);
 
                 test_run = true;
+                /*
+                 * Cleanup, reenable pull down if open collector.
+                 */
+                if (setup[pin] == 'O') {
+                    pin_enablePullDown(pin, 1);
+                }
+                hal_enableLoad(0);
+                pin_setMeasure(pin, 0);
             }
-
             break;
 
 
