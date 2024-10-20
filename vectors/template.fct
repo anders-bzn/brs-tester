@@ -75,6 +75,6 @@ output-drive-strength='26mA'
 
 # Those two values will define the voltage drop over the transistor compared top ground. First
 # the nominal value and then a margin that defines how much the value could diff from that.
-# In this example the drop might be ok if it in between 0 .. -200mV. -100 mV +/-100mV
-output-voltage-high='-100mV'
-output-voltage-margin='100mV'
+# In this example the drop might be ok if it in between 0 .. -300mV. -150 mV +/-150mV
+output-voltage-high='-150mV'
+output-voltage-margin='150mV'
