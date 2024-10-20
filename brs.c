@@ -56,6 +56,7 @@ static struct argp_option options[] = {
     {"pin",          'p', "PIN",      OPTION_ARG_OPTIONAL, "Manual pin manipulation [debug]"},
     {"pin-state",    's', "1/0/T/L",  OPTION_ARG_OPTIONAL, "Manual pin state [debug]"},
     {"load",         'L', "NUMBER",   OPTION_ARG_OPTIONAL, "Manual setting load on a pin [debug]"},
+    {"sigle-step",   'S', "",         OPTION_ARG_OPTIONAL, "Wait for user input before next test step"},
     { 0 }
 };
 
@@ -70,6 +71,7 @@ struct argp_arguments
     enum pwr power;
     int output_drive_strength;
     int loops;
+    bool single_step;
 };
 
 
@@ -135,6 +137,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
             return ARGP_ERR_UNKNOWN;
         }
         break;
+    case 'S':
+            arguments->single_step = true;
+        break;
     case ARGP_KEY_ARG:
         if (state->arg_num != 0){
             argp_usage (state);
@@ -183,6 +188,7 @@ int main (int argc, char *argv[])
     args.pin = -1;
     args.pinstate = '\0';
     args.output_drive_strength = 20;
+    args.single_step = false;
 
     vector_initVectors();
 
@@ -266,7 +272,7 @@ int main (int argc, char *argv[])
             printf("ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV\n");
             while(vectors[k].vector != NULL) {
                 if  (vectors[k].type == TYPE_LOGIC) {
-                    tests_checkLogic(board_config, vectors[k].vector);
+                    tests_checkLogic(board_config, vectors[k].vector, args.single_step);
                 }
                 k++;
             }
@@ -278,7 +284,7 @@ int main (int argc, char *argv[])
         int k=0;
         while(vectors[k].vector != NULL) {
             if  (vectors[k].type == TYPE_OUTPUT) {
-                tests_checkDriveStrength(board_config, vectors[k].vector);
+                tests_checkDriveStrength(board_config, vectors[k].vector, args.single_step);
             }
             if (vectors[k].type == TYPE_DEBUG_EXIT) {
                 return 0;

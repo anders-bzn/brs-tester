@@ -15,6 +15,16 @@
 #include "hal.h"
 #include "vector.h"
 
+static void waitUserInput(bool wait)
+{
+    if (wait) {
+        printf(" (Wait)");
+        getc(stdin);
+    } else {
+        printf("\n");
+    }
+}
+
 
 int tests_selfTest(void)
 {
@@ -231,7 +241,7 @@ int tests_setupBoard(struct config const *b_cfg)
             break;
         case 'g':
             /*
-             * NOTE: Pin should be tied to ground dring test
+             * NOTE: Pin should be tied to ground during test
              */
             printf("g");
             pin_setFunction(pin, PIN_GND);
@@ -387,7 +397,7 @@ int tests_checkPullDown(struct config const *b_cfg)
 }
 
 
-int tests_checkLogic(struct config const *b_cfg, char *vector)
+int tests_checkLogic(struct config const *b_cfg, char *vector, bool singleStep)
 {
     char const *setup = b_cfg->pin_def;
     bool test_failed = false;
@@ -441,7 +451,7 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
         pin_getName(pin, &pinName);
         if (setup[pin] == 'i' && vector[pin] == 'T') {
             pin_toggleData(pin, b_cfg->toggles);
-            printf("Toogle pin %s %d times\n", pinName, b_cfg->toggles);
+            printf("Toggle pin %s %d times\n", pinName, b_cfg->toggles);
         }
     }
 
@@ -483,12 +493,13 @@ int tests_checkLogic(struct config const *b_cfg, char *vector)
             return -1;
         }
     }
-    printf("      [ %s ] \n", test_failed ? "FAIL" : " OK ");
+    printf("      [ %s ]", test_failed ? "FAIL" : " OK ");
+    waitUserInput(singleStep);
     return 0;
 }
 
 
-int tests_checkDriveStrength(struct config const *b_cfg, char *vector)
+int tests_checkDriveStrength(struct config const *b_cfg, char *vector, bool singleStep)
 {
     printf("%s\n", vector);
 
@@ -522,7 +533,7 @@ int tests_checkDriveStrength(struct config const *b_cfg, char *vector)
              * Set output
              */
             if (vector[pin] == 'P') {
-                // Handle later, no Pulse function yet.
+                        // Handle later, no Pulse function yet.
             } else if (vector[pin] != '-') {
                 pin_setDataOut(pin, vector[pin] - '0');
             }
@@ -552,13 +563,13 @@ int tests_checkDriveStrength(struct config const *b_cfg, char *vector)
                     /*
                     * Do some limit testing. Compare voltage
                     */
-                    printf("Pin %s %3d mA  voltage %7.1f mV         [ %s ]\n", pinName,
-                                                                               testCurrent,
-                                                                               voltage,
-                                                                               result ? " ok " : "fail");
-
+                    printf("Pin %s %3d mA  voltage %7.1f mV         [ %s ]", pinName,
+                                                                             testCurrent,
+                                                                             voltage,
+                                                                             result ? " ok " : "fail");
+                    waitUserInput(singleStep);
                     testCurrent += b_cfg->output_drive_strength;
-                            } while (testCurrent <= b_cfg->output_drive_strength);
+                } while (testCurrent <= b_cfg->output_drive_strength);
 
                 test_run = true;
                 /*
