@@ -273,6 +273,9 @@ int tests_checkVoltages(struct config const *b_cfg)
      * 'g' - pin should be grounded on tested board
      * '-' - pin should not be used
      */
+    for (int pin = AA; pin < LAST_PIN; pin ++) {
+        if (str[pin] == 'g') pin_setFunction(pin, PIN_GND);
+    }
 
     for (int pin = AA; pin < LAST_PIN; pin ++) {
         int voltage_ok = 0;

@@ -1,0 +1,74 @@
+# B137 Diode gate
+# 
+#
+# First, every line starting with a '#' will be treated as a comment line
+# Blank lines will also be skipped.
+
+# Those two following lines are just helpers to make it easier to configure the right pin.
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppiiiiiiOgiiiiiiO------------------'
+
+vector='---0000001-0000001------------------'
+vector='---0000011-0000011------------------'
+vector='---0000101-0000101------------------'
+vector='---0001001-0001001------------------'
+vector='---0010001-0010001------------------'
+vector='---0100001-0100001------------------'
+vector='---1000001-1000001------------------'
+vector='---1111110-1111110------------------'
+
+# load-* keys are used to define limit values for tests of load networks
+# present on some boards. Used when the 'd' operator is found in the config string.
+load-low='-3700mV'
+load-low-margin='200mV'
+load-high='-50mV'
+load-high-margin='100mV'
+load-current='-10mA'
+load-current-margin='1mA'
+
+# input-* keys defined limits when testing inputs
+input-current-margin='2.0mA'
+
+# For a digital '0'
+input-voltage-high='-10mV'
+input-current-high='-2.0mA'
+
+# For a digital '1'
+input-voltage-low='-3700mV'
+input-current-low='0mA'
+
+# Number of times a pin should toggle when the 'T' function is used in the vector string.
+toggles='1000'
+
+# Define output testing. One line to set inputs so that the outputs are "0".
+# Outputs can only be loaded to -3V. The output value is not used but can be
+# useful. The L defines which outputs that should be tested. They can be on
+# a single line but can also be on several rows.
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#            'pppiiiiiiO-iiiiiiO------------------'
+output-drive='---111111L-111111-------------------'
+output-drive='---111111--111111L------------------'
+
+# output-drives-strength defines how much current the outputs can sink. This is a value is what
+# the tester will load the output with.
+output-drive-strength='16mA'
+
+# Those two values will define the voltage drop over the transistor compared top ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+# In this example the drop might be ok if it in between 0 .. -300mV. -150 mV +/-150mV
+output-voltage-high='-150mV'
+output-voltage-margin='150mV'
