@@ -25,6 +25,7 @@ enum check_format {
 static int validate_format(char *str, char *cfg, enum check_format format)
 {
     int numTogglePins = 0;
+    int numLoadPins = 0;
     /*
      * Check string for correct length, expect a trailing "'"
      */
@@ -119,8 +120,10 @@ static int validate_format(char *str, char *cfg, enum check_format format)
             if (str[i] == '-')
                 continue;
 
-            if (str[i] == 'L' && (cfg[i] == 'o' || cfg[i] == 'O'))
+            if (str[i] == 'L' && (cfg[i] == 'o' || cfg[i] == 'O')) {
+                numLoadPins++;
                 continue;
+            }
 
             if ((str[i] == '0' || str[i] == '1' || str[i] == 'P')  && cfg[i] == 'i')
                 continue;
@@ -128,6 +131,13 @@ static int validate_format(char *str, char *cfg, enum check_format format)
             if ((str[i] == '0' || str[i] == '1')  && (cfg[i] == 'o' || cfg[i] == 'O'))
                 continue;
 
+            return -1;
+        }
+        /*
+         * Only one output can be tested with load in each row, Since
+        * you can't now which pins that affects the output.
+         */
+        if (numLoadPins > 1) {
             return -1;
         }
     }
@@ -332,7 +342,7 @@ int vector_loadVectors(char *filename, struct config *board)
 	} else if (0 == strncmp("debug-exit", str, sizeof("debug-exit")-1))  {
             vectors[k].type = TYPE_DEBUG_EXIT;
             k++;
-            vectors[k].vector = NULL;	    
+            vectors[k].vector = NULL;
         } else {
             printf("ERROR: Error parse file line %d: %s\n", i, str);
             return -1;

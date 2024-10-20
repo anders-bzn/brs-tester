@@ -53,24 +53,25 @@ input-current-low='0mA'
 toggles='1000'
 
 # Define output testing. One line to set inputs so that the outputs are "0".
-# Outputs can only be loaded to -3V. The output value is not used but can be
-# useful. The L defines which outputs that should be tested. They can be on
-# a single line but can also be on several rows.
+# Outputs can only be loaded to -3V. The "L" defines which output that should be
+# tested. They can only be one "L" on each line. The test will first enable the load.
+# Then it will set the inputs to their values. Last the output will be tested, and
+# then the load will be disable. Row with only input values are valid and can be used
+# to put the board in a specific state.
 
 #             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
 #             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
 #            'pppoioioioioioioi-------------------'
 output-drive='---01010101010101-------------------'
-output-drive='---L-L------------------------------'
-output-drive='---10100101010101-------------------'
-output-drive='-------L-L-L------------------------'
-output-drive='----1-1-1-1-1-1-1-------------------'
-output-drive='-------------L-L--------------------'
-output-drive='----1-1-1-1-1-1-1-------------------'
-output-drive='---L-L-L-L-L-L-L--------------------'
+output-drive='-----L1-----------------------------'
+output-drive='-------L1---------------------------'
+output-drive='---------L1-------------------------'
+output-drive='-----------L1-----------------------'
+output-drive='-------------L1---------------------'
+output-drive='---------------L1-------------------'
 
-# output-drives-strength defines how much current the outputs can sink. This is a value is what
-# the tester will load the output with.
+# output-drives-strength defines how much current the outputs can sink. This is
+# a value is what the tester will load the output with.
 output-drive-strength='26mA'
 
 # Those two values will define the voltage drop over the transistor compared top ground. First

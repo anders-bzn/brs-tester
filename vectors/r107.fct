@@ -63,5 +63,10 @@ vector='---0-0-0-0-0-0-0--------------------'
 #             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
 #             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
 #            'pppoioioioioioioi-------------------'
-output-drive='---01010101010101-------------------'
-output-drive='---L-L-L-L-L-L-L--------------------'
+output-drive='---L1-------------------------------'
+output-drive='-----L1-----------------------------'
+output-drive='-------L1---------------------------'
+output-drive='---------L1-------------------------'
+output-drive='-----------L1-----------------------'
+output-drive='-------------L1---------------------'
+output-drive='---------------L1-------------------'
