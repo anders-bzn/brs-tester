@@ -1,5 +1,5 @@
 # B169 Diode gate
-# 
+#
 #
 # First, every line starting with a '#' will be treated as a comment line
 # Blank lines will also be skipped.
@@ -87,7 +87,11 @@ toggles='1000'
 #             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
 #             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
 #            'pppOOiiiiigiiiiiii------------------'
-output-drive='---LL11111-1111111------------------'
+# FIXME: There must be eight different combinations to test. One for each
+# output transistor. Each transistor should be tested separately!
+#output-drive='---LL11111-1111111------------------'
+#output-drive='---LL11111-1111111------------------'
+
 
 # output-drives-strength defines how much current the outputs can sink. This is a value is what
 # the tester will load the output with.
