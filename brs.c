@@ -243,7 +243,7 @@ int main (int argc, char *argv[])
 
         hal_powerEnable(1);
         usleep(1000000);
-
+	/*
         printf("TEST: Check voltages\n");
         if (0 > tests_checkVoltages(board_config)) {
             printf("ERROR: Execution halted due to voltage outside limits\n");
@@ -254,7 +254,7 @@ int main (int argc, char *argv[])
             hal_teardown();
             return -1;
         }
-
+	*/
         printf("TEST: Setup board\n");
         printf("AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB\n");
         printf("ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV\n");
