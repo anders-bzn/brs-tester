@@ -89,9 +89,14 @@ toggles='1000'
 #            'pppOOiiiiigiiiiiii------------------'
 # FIXME: There must be eight different combinations to test. One for each
 # output transistor. Each transistor should be tested separately!
-output-drive='---L-11111-1111111------------------'
-output-drive='----L11111-1111111------------------'
-
+output-drive='---L110100-0000000------------------'
+output-drive='---1L11000-0000000------------------'
+output-drive='---L100010-1000000------------------'
+output-drive='---1L00011-0000000------------------'
+output-drive='---L100000-0101000------------------'
+output-drive='---1L00000-0110000------------------'
+output-drive='---L100000-0000101------------------'
+output-drive='---1L00000-0000110------------------'
 
 # output-drives-strength defines how much current the outputs can sink. This is a value is what
 # the tester will load the output with.
