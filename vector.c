@@ -125,7 +125,7 @@ static int validate_format(char *str, char *cfg, enum check_format format)
                 continue;
             }
 
-            if ((str[i] == '0' || str[i] == '1' || str[i] == 'P')  && cfg[i] == 'i')
+            if ((str[i] == '0' || str[i] == '1')  && cfg[i] == 'i')
                 continue;
 
             if ((str[i] == '0' || str[i] == '1')  && (cfg[i] == 'o' || cfg[i] == 'O'))

@@ -525,71 +525,72 @@ int tests_checkDriveStrength(struct config const *b_cfg, char *vector, bool sing
      */
 
     for (int pin = AA; pin < LAST_PIN; pin++) {
+        /*
+         * Set the load, there could only be one 'L' per line. Assign the load
+         * to that pin.
+         */
+        if (vector[pin] == 'L') {
+            pin_setMeasure(pin, 1);
+            pin_enablePullDown(pin, 0);
+            hal_enableLoad(b_cfg->output_drive_strength, true);
+            usleep(200000);
+        }
+    }
+
+    for (int pin = AA; pin < LAST_PIN; pin++) {
         switch (setup[pin]) {
         case 'p':
         case 'g':
         case '-':
         case 'd':
+        case 'o':
+        case 'O':
             break;
         case 'i':
             /*
              * Set output
              */
-            if (vector[pin] == 'P') {
-                        // Handle later, no Pulse function yet.
-            } else if (vector[pin] != '-') {
+            if (vector[pin] == '0' || vector[pin] == '1') {
                 pin_setDataOut(pin, vector[pin] - '0');
             }
             break;
-        case 'o':
-        case 'O':
-            if (vector[pin] == 'L') {
-            int testCurrent = 0;
-                pin_setMeasure(pin, 1);
-                pin_getName(pin, &pinName);
-                pin_enablePullDown(pin, 0);
-
-                do {
-                    /*
-                    * Here, enable dummy load
-                    */
-                    hal_enableLoad(testCurrent, true);
-                    usleep(200000);
-                    hal_measureVoltage(&voltage);
-
-                    if (fabs(voltage - b_cfg->output_voltage_high) > b_cfg->output_voltage_margin){
-                        result = false;
-                    } else {
-                        result = true;
-                    }
-
-                    /*
-                    * Do some limit testing. Compare voltage
-                    */
-                    printf("Pin %s %3d mA  voltage %7.1f mV         [ %s ]", pinName,
-                                                                             testCurrent,
-                                                                             voltage,
-                                                                             result ? " ok " : "fail");
-                    waitUserInput(singleStep);
-                    testCurrent += b_cfg->output_drive_strength;
-                } while (testCurrent <= b_cfg->output_drive_strength);
-
-                test_run = true;
-                /*
-                 * Cleanup, reenable pull down if open collector.
-                 */
-                if (setup[pin] == 'O') {
-                    pin_enablePullDown(pin, 1);
-                }
-                hal_enableLoad(0, false);
-                pin_setMeasure(pin, 0);
-            }
-            break;
-
 
         default:
             printf("ERROR: Format error\n");
             return -1;
+        }
+    }
+
+    for (int pin = AA; pin < LAST_PIN; pin++) {
+        if (vector[pin] == 'L') {
+            usleep(10000);
+            pin_getName(pin, &pinName);
+            hal_measureVoltage(&voltage);
+
+            if (fabs(voltage - b_cfg->output_voltage_high) > b_cfg->output_voltage_margin){
+                result = false;
+            } else {
+                result = true;
+            }
+
+            /*
+             * Do some limit testing. Compare voltage
+             */
+            printf("Pin %s %3d mA  voltage %7.1f mV         [ %s ]", pinName,
+                                                                     b_cfg->output_drive_strength,
+                                                                     voltage,
+                                                                     result ? " ok " : "fail");
+            waitUserInput(singleStep);
+
+            test_run = true;
+            /*
+             * Cleanup, reenable pull down if open collector.
+             */
+            if (setup[pin] == 'O') {
+                pin_enablePullDown(pin, 1);
+            }
+            hal_enableLoad(0, false);
+            pin_setMeasure(pin, 0);
         }
     }
 
