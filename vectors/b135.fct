@@ -1,5 +1,5 @@
 # B135 Diode gate
-# 
+#
 #
 # First, every line starting with a '#' will be treated as a comment line
 # Blank lines will also be skipped.
@@ -60,7 +60,9 @@ toggles='1000'
 #             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
 #             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
 #            'pppiiiOoiiiOoiiiOo------------------'
-output-drive='---111L-111L-111L-------------------'
+output-drive='---111L-----------------------------'
+output-drive='--------111L------------------------'
+output-drive='-------------111L-------------------'
 
 # output-drives-strength defines how much current the outputs can sink. This is a value is what
 # the tester will load the output with.
