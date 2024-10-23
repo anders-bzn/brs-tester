@@ -1,11 +1,5 @@
 # Test for B133, 4 bit NAND with 3 pull downs
-#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
-#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-config='pppiiOdiiOdiiOdiiO------------------'
-vector='---101110111011101------------------'
-vector='---011101110111011------------------'
-vector='---001100110011001------------------'
-vector='---110111011101110------------------'
+
 
 load-low='-3700mV'
 load-low-margin='200mV'
@@ -14,8 +8,27 @@ load-high-margin='100mV'
 load-current='-10mA'
 load-current-margin='1mA'
 input-current-low='0.0mA'
-input-current-high='-1mA'
-input-current-margin='0.3mA'
+input-current-high='-1.2mA'
+input-current-margin='0.6mA'
 input-voltage-low='-3700mV'
 input-voltage-high='-10mV'
 output-drive-strength='26mA'
+output-voltage-high='-150mV'
+output-voltage-margin='150mV'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppiiOdiiOdiiOdiiO------------------'
+vector='---101110111011101------------------'
+vector='---011101110111011------------------'
+vector='---001100110011001------------------'
+vector='---110111011101110------------------'
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#             pppiiOdiiOdiiOdiiO------------------
+output-drive='---11L------------------------------'
+output-drive='-------11L--------------------------'
+output-drive='-----------11L----------------------'
+output-drive='------------1L----------------------'
+output-drive='---------------11L------------------'
