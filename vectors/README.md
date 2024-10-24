@@ -13,14 +13,14 @@ This table contains status of the different test vectors. A test vector should h
 |b137.fct     | T    |    |                                     |
 |b152.fct     | T    |    |                                     |
 |b165.fct     | OK   |    |                                     |
-|b169.fct     | T    |    |                                     |
+|b169.fct     | OK   |    |                                     |
 |b213.fct     | I    |    |Need sw support for pulse            |
 |g219.fct     | I    |    |Need sw and hw for testing           |
 |r107.fct     | OK   |    |                                     |
 |r111.fct     | I    |    |                                     |
 |r113.fct     | I    |    |                                     |
 |r202.fct     | I    |    |                                     |
-|r123.fct     | T    |    |                                     |
+|r123.fct     | OK   |    |                                     |
 |s111.fct     | I    |    |                                     |
 |r203.fct     | I    |    |                                     |
 |s206.fct     | I    |    |                                     |
