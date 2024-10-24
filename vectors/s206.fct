@@ -28,7 +28,7 @@ input-voltage-low='-3700mV'
 input-voltage-high='-50mV'
 
 # Define how much current the outputs can sink
-output-drive-strength='20mA'
+output-drive-strength='4mA'
 
 # The 'config' key describes how the tested board has it connections.
 #
@@ -111,3 +111,31 @@ vector='----10-0----01----------------------'
 vector='----11-0----01----------------------'
 vector='----1--0----01----------------------'
 
+
+# Define output testing. One line to set inputs so that the outputs are "0".
+# Outputs can only be loaded to -3V. The output value is not used but can be
+# useful. The L defines which outputs that should be tested. They can be on
+# a single line but can also be on several rows.
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#            'pppiOiiOiiiiOOiiii------------------'
+output-drive='-----1------------------------------'
+output-drive='-----0-L----------------------------'
+output-drive='-----0------L-----------------------'
+# Clock in a 0 in both flip-flops
+output-drive='----1-00--1-010--1------------------'
+output-drive='----0-01--0-100--0------------------'
+output-drive='----0-01--1-100--1------------------'
+output-drive='----L-01--1-100--1------------------'
+output-drive='----0-01--1-1L0--1------------------'
+
+# output-drives-strength defines how much current the outputs can sink. This is a value is what
+# the tester will load the output with.
+
+
+# Those two values will define the voltage drop over the transistor compared top ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+# In this example the drop might be ok if it in between 0 .. -300mV. -150 mV +/-150mV
+output-voltage-high='-150mV'
+output-voltage-margin='150mV'
