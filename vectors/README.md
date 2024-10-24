@@ -8,10 +8,10 @@ This table contains status of the different test vectors. A test vector should h
 |b105.fct     | I    |    |                                     |
 |b132.fct     | I    |    |                                     |
 |b133.fct     | OK   |    |                                     |
-|b134.fct     | I    |    |Need test for each output transistor |
-|b135.fct     | T    |    |                                     |
-|b137.fct     | T    |    |                                     |
-|b152.fct     | T    |    |                                     |
+|b134.fct     | OK   |    |                                     |
+|b135.fct     | OK   |    |                                     |
+|b137.fct     | OK   |    |                                     |
+|b152.fct     | OK   |    |                                     |
 |b165.fct     | OK   |    |                                     |
 |b169.fct     | OK   |    |                                     |
 |b213.fct     | I    |    |Need sw support for pulse            |
@@ -24,7 +24,7 @@ This table contains status of the different test vectors. A test vector should h
 |s111.fct     | I    |    |                                     |
 |r203.fct     | I    |    |                                     |
 |s206.fct     | I    |    |                                     |
-|s151.fct     | T    |    |                                     |
+|s151.fct     | OK   |    |                                     |
 |w005.fct     | OK   |    |                                     |
 
 |Status |Description                    |

@@ -18,7 +18,7 @@
 # 'g' - pin should be grounded on tested board
 # '-' - pin should not be used, don't care and it will be electrically disconnected
 #       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
-config='pppiiOoiiOoiiOoiiO------------------'
+config='pppiiOdiiOdiiOdiiO------------------'
 
 vector='---001100110011001------------------'
 vector='---010101010101010------------------'
@@ -57,10 +57,14 @@ toggles='1000'
 #             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
 #             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
 #            'pppiiOoiiOoiiOoiiO------------------'
-output-drive='---11L111-111-111-------------------'
-output-drive='---11-111L111-111-------------------'
-output-drive='---11-111-111L111-------------------'
-output-drive='---11-111-111-111L------------------'
+output-drive='---10L------------------------------'
+output-drive='---01L------------------------------'
+output-drive='-------10L--------------------------'
+output-drive='-------01L--------------------------'
+output-drive='-----------10L----------------------'
+output-drive='-----------01L----------------------'
+output-drive='---------------10L------------------'
+output-drive='---------------01L------------------'
 
 # output-drives-strength defines how much current the outputs can sink. This is a value is what
 # the tester will load the output with.
