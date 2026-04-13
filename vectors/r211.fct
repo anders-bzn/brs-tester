@@ -1,0 +1,605 @@
+# Test for R211, Memory Address(MA), Memory Buffer(MB) & Program Counter(PC)
+#
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# ! DO NOT TEST THE R211 IN AN UNMODIFIED BRS-TESTER  !
+# ! PINS BA & BB ARE SIGNALS AND NOT +10/-15 RAILS    !
+# ! AT BEST, YOU'LL BLOW THE 10V FUSE.                !
+# ! FOR NOW, ONE OF THESE DCDs IS NOT TESTED          !
+# ! SEE END OF THIS FILE FOR MODIFICATION DETAILS     !
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# First test the indpendant inputs to the flip flops.
+# Then test the inter-register transfers such as MB->PC, MB->MA, PC->MB etc
+
+# To support transfer of MB -> PC:
+# Output of the MB flip-flop serves as one of the level input(s) to the PC flip-flop
+# To support transfer of PC -> MB:
+# Output of the PC flip-flop serves as one of the level input(s) to the MB flip-flop
+#
+# A logic 1 = -3V and a logic 0 = 0V
+# The Flip-Flops will be in an unknown state until after step 2
+# All functions verified but the input current definitions may need adjustments
+
+
+
+
+# -3V = Logic '1'
+#  0V = Logic '0'
+# Define the limits when testing inputs
+# Inputs are 11mA load at gnd; Refer F-85 PDP-8 Users Handbook
+# input-current-low (current at logic '0')
+# input-current-high (current at logic '1')
+input-current-low='-1.0mA'
+input-current-high='-11.0mA'
+input-current-margin='11.0mA'
+input-voltage-low='-3700mV'
+input-voltage-high='-50mV'
+
+# Define how much current the outputs can sink
+# 11mA on the 0 Output and 13mA on the 1 Output
+output-drive-strength='11mA'
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Hold all of the control inputs inactive, ignore the outputs
+vector='-------11111111111---11111--11111111'
+
+##################################################################
+################  MA Flip Flop Independant Tests  ################
+##################################################################
+# Let's clear the MA flip-flop with the CJ direct clear input
+# Drive CJ Direct Clear input active, check both outputs
+vector='----1-001111111111---11111--11111111'
+# Drive CJ Direct Clear input inactive, check both outputs
+vector='----1-011111111111---11-11--11111111'
+
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# 1.1 Drive the CR Level Input active, check for no change on the outputs
+vector='-------11111101111---10111--11111111'
+# 1.2 Drive the CP Pulse Input active, flip-flip should be set
+vector='----0-111111001111---00111--11111111'
+# 1.3 Drive the CP Pulse Input inactive, flip-flip should stay set
+vector='----0-111111101111---10111--11111111'
+# 1.4 Drive the CR Level Input inactive, check for no change on the outputs
+vector='----0-111111111111---10111--11111111'
+# 1.1 Drive the !CR Level Input active, check for no change on the outputs
+vector='----0-111111111111---11111--11111111'
+# 1.2 Drive the CP Pulse Input active, flip-flip should be cleared
+vector='----1-011111011111---01111--11111111'
+# 1.3 Drive the CP Pulse Input inactive, flip-flip should stay cleared
+vector='----1-011111111111---11111--11111111'
+# 1.4 Drive the !CR Level Input inactive, check for no change on the outputs
+vector='----1-011111111111---11111--11111111'
+
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Let's set the MA flip-flop with the CK direct clear input
+vector='----1-011111111111---10111--11111111'
+# Drive CK Direct Set inpput active, check both outputs
+vector='----0-110111111111---11111--11111111'
+# Drive CK Direct Set input inactive, check both outputs
+vector='----0-111111111111---11-11--11111111'
+
+# Let's clear the MA flip-flop with the CL direct clear input
+vector='----0-111111111111---10111--11111111'
+# Drive CL Direct Clear input active, check both outputs
+vector='----1-011011111111---11111--11111111'
+# Drive CL Direct Clear input inactive, check both outputs
+vector='----1-011111111111---11-11--11111111'
+
+
+##################################################################
+################  PC Flip Flop Independant Tests  ################
+##################################################################
+# Let's clear the PC flip-flop with the direct clear input
+# Drive CV Direct Clear input active, check both outputs
+vector='-------11111111110---11111--11111111'
+# Drive CV Direct Clear input inactive, check both outputs
+vector='-------11111111111---111110101111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Now toggle it to set
+# 1.1 Drive the DE Level Input active, check for no change on the outputs
+vector='-------11111111111---101110111111111'
+# 1.2 Drive the DD Pulse Input active, flip-flip should be set
+vector='-------11111111111---001111011111111'
+# 1.3 Drive the DD Pulse Input inactive, flip-flip should stay set
+vector='-------11111111111---101111011111111'
+# 1.4 Drive the DE Level Input inactive, check for no change on the outputs
+vector='-------11111111111---111111011111111'
+# 1.1 Drive the DE Level Input active, check for no change on the outputs
+vector='-------11111111111---101111011111111'
+# 1.2 Drive the DD Pulse Input active, flip-flip should be cleared
+vector='-------11111111111---001110111111111'
+# 1.3 Drive the DD Pulse Input inactive, flip-flip should stay cleared
+vector='-------11111111111---101110111111111'
+# 1.4 Drive the DE Level Input inactive, check for no change on the outputs
+vector='-------11111111111---101110111111111'
+
+# Single DCD Gate for setting PC flip flop.
+# 6. Clock SR into PC (setting it)
+#    Note: Hardware is modified to allow card pin DB to ALSO be driven by CP.
+#          Ignore the value that will simulataneously be clocked into MA
+#
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive the DF Level Input active, check for no change on the outputs
+vector='---1-0-11111111111---11011--11111111'
+# Drive DB(via CP channel) active, check both outputs
+vector='---1-0-11111011111---11011--11111111'
+# Drive DB(via CP channel) inactive, check both outputs
+vector='---1-0-11111111111---110111011111111'
+# Drive the DF Level Input inactive, check for no change on the outputs
+vector='---1-0-11111111111---111111011111111'
+
+
+#################################################################
+################  MB Flip Flop Independant Tests ################
+#################################################################
+
+####################################################################
+# Testing Toggle DCD Input CLK: DH   Level inputs: DJ
+####################################################################
+# 0. Setup
+# Let's clear the flip-flop with the direct clear input
+# Drive CU Direct Clear input active, check both outputs
+vector='-------11111111101-----111--11111111'
+# Drive CU Direct Clear input inactive, check both outputs
+vector='---1-0-11111111111-----111--11111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Now toggle it to set
+# 1.1 Drive the DH Level Input active, check for no change on the outputs
+vector='---1-0-11111111111---11101--11111111'
+# 1.2 Drive the DJ Pulse Input active, flip-flip should be set
+vector='---0-1-11111111111---11100--11111111'
+# 1.3 Drive the DJ Pulse Input inactive, flip-flip should stay set
+vector='---0-1-11111111111---11101--11111111'
+# 1.4 Drive the DH Level Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--11111111'
+# 1.1 Drive the DH Level Input active, check for no change on the outputs
+vector='---0-1-11111111111---11101--11111111'
+# 1.2 Drive the DJ Pulse Input active, flip-flip should be cleared
+vector='---1-0-11111111111---11100--11111111'
+# 1.3 Drive the DJ Pulse Input inactive, flip-flip should stay cleared
+vector='---1-0-11111111111---11101--11111111'
+# 1.4 Drive the DH Level Input inactive, check for no change on the outputs
+vector='---1-0-11111111111---11111--11111111'
+
+####################################################################
+# Testing CLK: DT   JK inputs:   /DN
+####################################################################
+# 0. Setup
+# Let's clear the flip-flop with the direct clear input
+# Drive CU Direct Clear input active, check both outputs
+vector='-------11111111101---11111--11111111'
+# Drive CU Direct Clear input inactive, check both outputs
+vector='---1-0-11111111111---11111--11111111'
+
+
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# 2.1 Drive the DN Level Input active, check for no change on the outputs
+vector='---1-0-11111111111---11111--10111111'
+# 2.2 Drive the DT Pulse Input active, flip-flip should be set
+vector='---0-1-11111111111---11111--10111011'
+# 2.3 Drive the DT Pulse Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--10111111'
+# 2.4 Drive the DN Level Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--11111111'
+
+####################################################################
+# Testing CLK: DS   JK inputs:   /DM
+####################################################################
+# 0. Setup
+# Let's clear the flip-flop with the direct clear input
+# Drive CU Direct Clear input active, check both outputs
+vector='-------11111111101---11111--11111111'
+# Drive CU Direct Clear input inactive, check both outputs
+vector='---1-0-11111111111---11111--11111111'
+
+
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# 2.1 Drive the DM Level Input active, check for no change on the outputs
+vector='---1-0-11111111111---11111--01111111'
+# 2.2 Drive the DS Pulse Input active, flip-flip should be set
+vector='---0-1-11111111111---11111--01110111'
+# 2.3 Drive the DS Pulse Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--01111111'
+# 2.4 Drive the DM Level Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--11111111'
+
+####################################################################
+# Testing CLK: DU   JK inputs: DR/DP
+####################################################################
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# 1.1 Drive the DR Level Input active, check for no change on the outputs
+vector='---0-1-11111111111---11111--11101111'
+# 1.2 Drive the DU Pulse Input active, flip-flip should be cleared
+vector='---1-0-11111111111---11111--11101101'
+# 1.3 Drive the DU Pulse Input inactive, flip-flip should stay cleared
+vector='---1-0-11111111111---11111--11101111'
+# 1.4 Drive the DR Level Input inactive, check for no change on the outputs
+vector='---1-0-11111111111---11111--11111111'
+
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# 2.1 Drive the DR Level Input active, check for no change on the outputs
+vector='---1-0-11111111111---11111--11011111'
+# 2.2 Drive the DP Pulse Input active, flip-flip should be set
+vector='---0-1-11111111111---11111--1101110-'
+# 2.3 Drive the DP Pulse Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--11011111'
+# 2.4 Drive the DR Level Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--11111111'
+
+####################################################################
+# Testing CT falling edge direct set
+####################################################################
+# 0. Setup
+# Let's clear the flip-flop with the direct clear input
+# Drive CT Direct Clear input active, check both outputs
+vector='-------11111111011---11111--11111111'
+# Drive CT Direct Clear input inactive, check both outputs
+vector='---0-1-11111111111---11111--11111111'
+
+
+##################################################################
+################  Transfer to PC Flip Flop Tests  ################
+##################################################################
+## Transfer MB to PC
+# 1. Clear the PC
+# Let's clear the PC flip-flop with the direct clear input
+# Drive CV Direct Clear input active, check both outputs
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+vector='-------11111111110---11111--11111111'
+# Drive CV Direct Clear input inactive, check both outputs
+vector='-------11111111111---111110101111111'
+
+# 2. Set the MB flip flop so that we try passing a logic '1' to PC
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive the DM Level Input active
+vector='-------11111111111---11111--01111111'
+# Drive the DS Pulse Input active, flip-flip should be set
+vector='---0-1-11111111111---11111--01110111'
+# Drive the DS Pulse Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--01111111'
+# Drive the DM Level Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--11111111'
+
+# 3. Clock MB into PC with falling edge on DA
+#    Note: Hardware is modified to allow card pin DA to be driven by CS
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive DA(via CS channel) active, check both outputs
+vector='---0-1-11111111111---11111--11111111'
+# Drive DA(via CS channel) inactive, check both outputs
+vector='---0-1-11111110111---111111011111111'
+
+# 4. Clear the MB flip flop so that we can try passing a logic '0' to PC
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive CU Direct Clear input active, check both outputs
+vector='-------11111111101---11111--11111111'
+# Drive CU Direct Clear input inactive, check both outputs
+vector='---1-0-11111111111---11111--11111111'
+
+# 5. Clock MB into PC with falling edge on DA
+#    Note: Hardware is modified to allow card pin DA to be driven by CS
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive DA(via CS channel) active, check both outputs
+vector='---1-0-11111110111---11111--11111111'
+# Drive DA(via CS channel) inactive, check both outputs
+vector='---1-0-11111111111---111110101111111'
+
+
+###################################################################
+################  Transfer to MA Flip Flop  Tests  ################
+###################################################################
+
+#### Transfer MB to MA
+# 1. Clear the MA
+# Let's clear the MA flip-flop with the direct clear input
+# Drive CJ Direct Clear input active, check both outputs
+vector='-------01111111111---11111--11111111'
+# Drive CJ Direct Clear input inactive, check both outputs
+vector='----1-011111111111---11111--11111111'
+
+# 2. Set the MB flip flop so that we try passing a logic '1' to MA
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive the DM Level Input active
+vector='-------11111111111---11111--01111111'
+# Drive the DS Pulse Input active, flip-flip should be set
+vector='---0-1-11111111111---11111--01110111'
+# Drive the DS Pulse Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--01111111'
+# Drive the DM Level Input inactive, check for no change on the outputs
+vector='---0-1-11111111111---11111--11111111'
+
+# 3. Clock MB into MA with falling edge on CN
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive CN active, check both outputs
+vector='---001111110111111---11111--11111111'
+# Drive CN inactive, check both outputs
+vector='---001111111111111---11111--01111111'
+
+# 4. Clear the MB flip flop so that we can try passing a logic '0' to MA
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive CU Direct Clear input active, check both outputs
+vector='-------11111111101---11111--11111111'
+# Drive CU Direct Clear input inactive, check both outputs
+vector='---1-0-11111111111---11111--11111111'
+
+# 5. Clock MB into MA with falling edge on DA
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive DA(via CS channel) active, check both outputs
+vector='---110011110111111---11111--11111111'
+# Drive DA(via CS channel) inactive, check both outputs
+vector='---110011111111111---11111--01111111'
+
+
+#### Transfer PC to MA
+# 1. Clear the MA
+# Let's clear the MA flip-flop with the direct clear input
+# Drive CJ Direct Clear input active, check both outputs
+vector='-------01111111111---11111--11111111'
+# Drive CJ Direct Clear input inactive, check both outputs
+vector='----1-011111111111---11111--11111111'
+
+# 2. Set the PC flip flop so that we try passing a logic '1' to MA
+# The only way to set PC is to clear and then toggle
+# Drive CV Direct Clear input active, check both outputs
+vector='----1-011111111110---11111--11111111'
+# Drive CV Direct Clear input inactive, check both outputs
+vector='----1-011111111111---111110101111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Now toggle it to set
+# 1.1 Drive the DE Level Input active, check for no change on the outputs
+vector='----1-011111111111---101110111111111'
+# 1.2 Drive the DD Pulse Input active, flip-flip should be set
+vector='----1-011111111111---001111011111111'
+# 1.3 Drive the DD Pulse Input inactive, flip-flip should stay set
+vector='----1-011111111111---101111011111111'
+# 1.4 Drive the DE Level Input inactive, check for no change on the outputs
+vector='----1-011111111111---111111011111111'
+
+# 3. Clock PC into MA with falling edge on CM
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive CM active, check both outputs
+vector='----0-111101111111---111111011111111'
+# Drive CM inactive, check both outputs
+vector='----0-111111111111---111111011111111'
+
+# 4. Clear the PC flip flop and set the MA so that we can try passing
+#    a logic '0' to MA from the PC
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive CV Direct Clear input active, check both outputs
+vector='-------11111111110---11111--11111111'
+# Drive CV Direct Clear input inactive, check both outputs
+vector='-------11111111111---111110101111111'
+# Drive the CR Level Input active
+vector='-------11111101111---11111--11111111'
+# Drive the CP Pulse Input active, MA flip-flip should be set
+vector='----0-111111001111---01111--11111111'
+
+# 5. Clock PC into MA with falling edge on CM
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive CM active, check both outputs
+vector='---110011101111111---111110111111111'
+# Drive CM inactive, check both outputs
+vector='---110011111111111---111110111111111'
+
+
+###################################################################
+################  Transfer to MB Flip Flop  Tests  ################
+###################################################################
+
+#### Transfer PC to MB
+# 1. Clear the MB
+# Let's clear the MB flip-flop with the direct clear input
+# Drive CU Direct Clear input active, check both outputs
+vector='-------11111111101---11111--11111111'
+# Drive CU Direct Clear input inactive, check both outputs
+vector='---1-0-11111111111---11111--11111111'
+
+# 2. Set the PC flip flop so that we try passing a logic '1' to MB
+# The only way to set PC is to clear and then toggle
+# Drive CV Direct Clear input active, check both outputs
+vector='-------11111111110---11111--11111111'
+# Drive CV Direct Clear input inactive, check both outputs
+vector='-------11111111111---111110101111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Now toggle it to set
+# 1.1 Drive the DE Level Input active, check for no change on the outputs
+vector='-------11111111111---101110111111111'
+# 1.2 Drive the DD Pulse Input active, flip-flip should be set
+vector='-------11111111111---001111011111111'
+# 1.3 Drive the DD Pulse Input inactive, flip-flip should stay set
+vector='-------11111111111---101111011111111'
+# 1.4 Drive the DE Level Input inactive, check for no change on the outputs
+vector='-------11111111111---111111011111111'
+
+# 3. Clock PC into MB with falling edge on DV
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive DV active, check both outputs
+vector='---0-1-11111111111---11111--11111110'
+# Drive DV inactive, check both outputs
+vector='---0-1-11111111111---11111--01111111'
+
+# 4. Clear the PC flip flop so that we can try passing a logic '0' to MB
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive CV Direct Clear input active, check both outputs
+vector='-------11111111110---11111--11111111'
+# Drive CV Direct Clear input inactive, check both outputs
+vector='-------11111111111---111110101111111'
+
+# 5. Clock MB into MA with falling edge on DV
+#       CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppooooiiiiiiiiiiipppiiiiiooiiiiiiii'
+# Drive DV active, check both outputs
+vector='---1-0-11111111111---11111--11111110'
+# Drive DV inactive, check both outputs
+vector='---1-0-11111111111---11111--01111111'
+
+
+###############################################################
+################  Flip Flop Output Load Tests  ################
+###############################################################
+
+## MB
+#             CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#             pppooooi--iiiiiiiipppiiiiiooiiiiiiii
+output-drive='-------1--11111101---11111--11111111'
+# Drive CU Direct Clear input active
+output-drive='-----L-1--11111111---11111--11111111'
+# Drive CT Direct Set input active
+output-drive='---L---1--11111011---11111--11111111'
+
+## PC
+#             CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config      'pppooooi--iiiiiiiipppiiiiiooiiiiiiii'
+# Drive DA(via CS channel) active to copy MB->PC
+output-drive='-------1--11111111---11111--11111111'
+# Drive DA(via CS channel) inactive
+output-drive='-------1--11110111---11111--11111111'
+output-drive='-------1--11111111---11111-L11111111'
+
+#             CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#             pppooooi--iiiiiiiipppiiiiiooiiiiiiii
+# Set all inputs to inactive and use direct set and clear to configure flip-flop
+# Drive CV Direct Set input active
+output-drive='-------1--11111111---11111--11111111'
+# Reset PC (CV direct clear) and Measure '1' output
+output-drive='-------1--11111110---11111L-11111111'
+
+
+# # Toggle the output with complement input(DD) and measure the '1' output
+# output-drive='-------1--11111111---10111--11111111'
+# # 1.2 Drive the DD Pulse Input active, flip-flip should be set
+# output-drive='-------1--11111111---00111-L11111111'
+# # 1.3 Drive the DD Pulse Input inactive, flip-flip should stay set
+# output-drive='-------1--11111111---10111-L11111111'
+# # 1.4 Drive the DE Level Input inactive, check for no change on the outputs
+# output-drive='-------1--11111111---11111-L11111111'
+
+## MA
+#             CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#             pppooooi--iiiiiiiipppiiiiiooiiiiiiii
+output-drive='------00--11111111---11111--11111111'
+# Drive CJ Direct Clear input inactive, check both outputs
+output-drive='------L1--11111111---11111--11111111'
+
+# Drive the CR Level Input active
+output-drive='-------1--11101111---10111--11111111'
+# Drive the CP Pulse Input active, flip-flip should be set
+output-drive='----0--1--11001111---00111--11111111'
+# Drive the CP Pulse Input inactive, flip-flip should stay set
+output-drive='----0--1--11101111---10111--11111111'
+# Drive the CR Level Input inactive, check for no change on the outputs
+output-drive='----L--1--11111111---10111--11111111'
+
+# output-drives-strength defines how much current the outputs can sink.
+# This is a value is what the tester will load the output with.
+output-drive-strength='18mA'
+
+# Those two values will define the voltage drop over the transistor compared to ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+output-voltage-high='-150mV'
+output-voltage-margin='100mV'
+
+
+####################################################################################
+#
+# Making an adapter for testing pin DA
+#
+# The R211 has only one unused pin, CS.
+# Pins DA & DB are signals rather than power supplies
+#
+# The following instructions allow you to build an interposing board between the
+# brs-tester and connector board.
+#
+# Build details:
+#
+# Taking a spare connector PCB, cut the following tracks:
+# 1. Cut track from JP3 (on the -> Tester side) to BA2
+# 2. Cut track from JP3 (on the -> Tester side) to BB2
+# 3. Jumper BB2 to BC2
+# 4. Jumper BA2 to AS2
+#
+# This has the effect of
+# - Connecting DB to GND (conveniently nearby on pin DC)
+# - Connecting DA to CS (you'll see notes in tests above about testing DA via CS)
+#
+#
+#
+#             CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#             pppooooi--iiiiiiiipppiiiiiooiiiiiiii
+#                         | |   ||
+#                         | |   ||
+#                         | \___/|
+#                         \______/
+#
+#
+####################################################################################
