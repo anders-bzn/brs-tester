@@ -1,0 +1,114 @@
+# Test for R602 Dual Pulse Amplifier
+# Diode and DCD inputs
+# A logic 1 = -3V and a logic 0 = 0V
+
+# -3V = 1
+# 0V = 0
+# Define the limits when testing inputs
+input-current-low='-1.0mA'
+input-current-high='-3.7mA'
+input-current-margin='3.5mA'
+input-voltage-low='-3700mV'
+input-voltage-high='-50mV'
+
+# PA 1
+# L Diode input
+# H DCD 1 Edge input
+# J DCD 1 Level input
+# E DCD 2 Edge input
+# F DCD 2 Level input
+# K Output
+
+# PA 2
+# V Diode input
+# S DCD 1 Edge input
+# T DCD 1 Level input
+# P DCD 2 Edge input
+# R DCD 2 Level input
+# U Output
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+# Pulse amplifiers generate a fixed width "standard" pulse 100nS wide. This is much too
+# fast to capture by polling the input. Instead, each of the pulse outputs is toggled
+# multiple times and triggered by first the diode input and then the DCD input.
+# The pulses can be captured on an oscilloscope to confirm the pulse is correct.
+
+toggles='5000'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='ppp-iiiioi--iiiioi------------------'
+# Idle everything
+vector='----111111--111111------------------'
+
+# Test PA 1 Diode input
+vector='----111111--111111------------------'
+vector='----1111-T--111111------------------'
+vector='----111111--111111------------------'
+
+# Test PA 1 DCD input 1
+# Set the level input to active '0'
+vector='----111011--111111------------------'
+# Toggle the pulse input and observe the pulse on an oscilloscope
+# Ignore the output here as it's much too fast for polling on the ADC
+vector='----11T0-1--111111------------------'
+# Reset everything to inactive
+vector='----111111--111111------------------'
+
+# Test PA 1 DCD input 2
+# Set the level input to active '0'
+vector='----101111--111111------------------'
+# Toggle the pulse input and observe the pulse on an oscilloscope
+# Ignore the output here as it's much too fast for polling on the ADC
+vector='----T011-1--111111------------------'
+# Reset everything to inactive
+vector='----111111--111111------------------'
+
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'ppp-iiiioi--iiiioi------------------'
+# Idle everything
+vector='----111111--111111------------------'
+
+# Test PA 2 Diode input
+vector='----111111--111111------------------'
+vector='----111111--1111-T------------------'
+vector='----111111--111111------------------'
+
+# Test PA 2 DCD input 1
+# Set the level input to active '0'
+vector='----111111--111011------------------'
+# Toggle the pulse input and observe the pulse on an oscilloscope
+# Ignore the output here as it's much too fast for polling on the ADC
+vector='----1111-1--11T0-1------------------'
+# Reset everything to inactive
+vector='----111111--111111------------------'
+
+# Test PA 2 DCD input 2
+# Set the level input to active '0'
+vector='----111111--101111------------------'
+# Toggle the pulse input and observe the pulse on an oscilloscope
+# Ignore the output here as it's much too fast for polling on the ADC
+vector='----1111-1--T011-1------------------'
+# Reset everything to inactive
+vector='----111111--111111------------------'
+
+
+# output-drives-strength defines how much current the outputs can sink.
+# This is a value is what the tester will load the output with.
+output-drive-strength='70mA'
+
+# Those two values will define the voltage drop over the transistor compared to ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+output-voltage-high='-150mV'
+output-voltage-margin='200mV'
