@@ -1,0 +1,44 @@
+# Test for W300, Delay line
+
+# -3V = Logic 1
+# 0V = Logic 	0
+# Define the limits when testing inputs
+input-current-low='0.0mA'
+input-current-high='-0.5mA'
+input-current-margin='2.0mA'
+input-voltage-low='-3700mV'
+input-voltage-high='-50mV'
+
+# Define how much current the outputs can sink
+output-drive-strength='2mA'
+output-voltage-high='-100mV'
+output-voltage-margin='100mV'
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+# Number of times a pin should toggle when the 'T' function is used in the vector string.
+toggles='1000
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppi--------------ppp--iO---iO--iO--'
+
+# Toggle the delay line input a few times for inspection on an oscilloscope
+vector='---T--------------------------------'
+
+# Test the gated inputs as inverters
+vector='---0-------------------1----1---1---'
+vector='---0-------------------10---10--10--'
+vector='---0-------------------01---10--10--'
+vector='---0-------------------10---01--10--'
+vector='---0-------------------10---10--01--'
+vector='---0-------------------01---01--01--'
+vector='---0-------------------10---10--10--'
