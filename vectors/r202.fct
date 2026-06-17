@@ -23,9 +23,9 @@
 # -3V = 1
 # 0V = 0
 # Define the limits when testing inputs
-input-current-low='0.0mA'
-input-current-high='-1.7mA'
-input-current-margin='1.0mA'
+input-current-low='0.5mA'
+input-current-high='-3.0mA'
+input-current-margin='3.0mA'
 input-voltage-low='-3700mV'
 input-voltage-high='-50mV'
 #
@@ -33,8 +33,8 @@ input-voltage-high='-50mV'
 # 11mA on the 0 Output and 13mA on the 1 Output
 output-drive-strength='11mA'
 
-# The 'config' key describes how the tested board has it connections. 
-# 
+# The 'config' key describes how the tested board has it connections.
+#
 # 'p' - power pin, do nothing
 # 'i' - input pin on tested board
 # 'o' - output pin on tested board
@@ -91,3 +91,27 @@ vector='---111011111110111------------------'
 # Wiggle the Level Inputs, check for no change on the outputs
 vector='---101011011010110------------------'
 vector='---111011111110111------------------'
+
+
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#      config'pppiiiooiiiiiiooii------------------'
+# Drive F&R Direct Clear inputs active, check '1' outputs J & T
+output-drive='---1-1--1-11-1--1-------------------'
+# Drive F & R Direct Clear inputs active, check both outputs
+output-drive='---1-0--1-11-0--1-------------------'
+output-drive='---1-0-L1-11-0--1-------------------'
+output-drive='---1-0--1-11-0-L1-------------------'
+
+# Drive M Direct Clear input active, check '0' outputs H & S
+output-drive='---1-1--1-11-1--1-------------------'
+
+output-drive='---1-1--1-01-1--1-------------------'
+output-drive='---1-1L-1-01-1--1-------------------'
+output-drive='---1-1--1-01-1L-1-------------------'
+
+# Those two values will define the voltage drop over the transistor compared to ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+output-voltage-high='-150mV'
+output-voltage-margin='100mV'
