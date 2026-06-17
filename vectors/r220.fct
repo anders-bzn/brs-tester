@@ -1,0 +1,131 @@
+# Test for S220, 3 bit shift register.
+# DCD inputs for direct Clear
+# A logic 1 = -3V and a logic 0 = 0V
+
+# Essentially a 3 bit latch.
+
+# P(2), R(1) and S(0) are the preload inputs. Note they are active low signals
+# T is "read in" - the preload clock (positive going edge triggered)
+# K is a direct clear for all three bits
+# V is the right shift (positive edge triggered)
+
+# Let's label the outputs bits 2, 1, 0
+# N bit 2: '0' output
+# U bit 2: '1' output
+# F bit 1: '0' output
+# H bit 1: '1' output
+# E bit 0: '0' output
+# D bit 0: '1' output
+
+# J is the diode or'd output of all three '0' bits
+
+# M(0) & L(1) are the DCD level inputs on bit 2
+
+# -3V = 1
+# 0V = 0
+# Define the limits when testing inputs
+input-current-low='-1.0mA'
+input-current-high='-3.7mA'
+input-current-margin='3.5mA'
+input-voltage-low='-3700mV'
+input-voltage-high='-50mV'
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppoooooiiioiiiioi------------------'
+# Hold all of the control inputs inactive, ignore the outputs
+vector='--------111-1111--------------------'
+# Clear everything with direct clear input K
+vector='---0110-0111111101------------------'
+
+# Perform a walking 1 test. Latch in a single 1 and clock it right to the end of the shift register
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppoooooiiioiiiioi------------------'
+# Release the direct clear K and Setup a binary 100 on PRS (011 as active low inputs)
+vector='-------0111-0111-1------------------'
+# Load it in with T
+vector='-------0110-0110-1------------------'
+vector='---011001100011011------------------'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppoooooiiioiiiioi------------------'
+# Shift right by driving V active and then inactive setting bit pattern 010 on UHD & 101 on NFE
+vector='---010101101011000------------------'
+vector='---010101101011001------------------'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppoooooiiioiiiioi------------------'
+# Shift right by driving V active and then inactive setting bit pattern 001 on UHD & 110 on NFE
+vector='---101001101011000------------------'
+vector='---101001101011001------------------'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppoooooiiioiiiioi------------------'
+# Shift right by driving V active and then inactive setting bit pattern 000 on UHD & 111 on NFE
+vector='---011001101011000------------------'
+vector='---011001101011001------------------'
+
+
+# Load in all 1's
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppoooooiiioiiiioi------------------'
+# Hold all of the control inputs inactive, ignore the outputs
+vector='--------111-1111--------------------'
+# Clear everything with direct clear input K
+vector='---0110-0111111101------------------'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppoooooiiioiiiioi------------------'
+# Release the direct clear K and Setup a binary 000 on PRS
+vector='-------0111-0001-1------------------'
+# Load it in with T
+vector='-------0110-0000-1------------------'
+vector='---100101100000111------------------'
+
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppoooooiiioiiiioi------------------'
+# Wiggle the Level Inputs, check for no change on the outputs
+vector='---100101110111111------------------'
+vector='---100101000000111------------------'
+vector='---100101100010111------------------'
+vector='---100101010001011------------------'
+vector='---100101110110011------------------'
+
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#      config'pppoooooiiioiiiioi------------------'
+# Drive K Direct Clear input active, check '1' outputs U, H & D
+output-drive='--------011-1111L1------------------'
+output-drive='------L-011-1111-1------------------'
+output-drive='---L----011-1111-1------------------'
+
+# Load testing the '0' outputs E, F & J disabled for now.
+# These will fail with anything over 1mA for some reason
+
+# output-drives-strength defines how much current the outputs can sink.
+# This is a value is what the tester will load the output with.
+output-drive-strength='6mA'
+
+# Those two values will define the voltage drop over the transistor compared to ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+output-voltage-high='-150mV'
+output-voltage-margin='200mV'
