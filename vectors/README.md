@@ -33,6 +33,7 @@ This table contains status of the different test vectors. A test vector should h
 |s151.fct     | OK   |    |                                     |
 |s181.fct     | OK   |    |                                     |
 |w005.fct     | OK   |    |                                     |
+|w300.fct     | OK   |    |                                     |
 
 |Status |Description                    |
 |------ |-------------------------------|
