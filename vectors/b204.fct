@@ -1,0 +1,111 @@
+# Test for B204, Quad SR flip-flop with a common asynchronous clear
+#
+# Use the '0' output as a set input.
+#
+# Flip-flop 1
+# F is '0' output
+# E is '1' output
+# H is the resistor connected output
+# D is the common asynchronous clear input
+#
+# To be able to test, let's treat the signals as:
+# F is async set input
+# E is '1' (active high) output
+# H is ignored
+# D is the common asynchronous clear input
+
+# Similarly:
+# Flip-flop 2
+# K is async set input
+# J is '1' (active high) output
+#
+# Flip-flop 3
+# P is async set input
+# N is '1' (active high) output
+#
+# Flip-flop 4
+# T is async set input
+# S is '1' (active high) output
+
+# Logic levels in this test
+# -3V = 1
+# 0V = 0
+
+
+# Define the limits when testing inputs
+input-current-low='-3.0mA'
+input-current-high='-3.6mA'
+input-current-margin='4.0mA'
+input-voltage-low='-3700mV'
+input-voltage-high='-100mV'
+
+# Define how much current the outputs can sink
+output-drive-strength='6mA'
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppioi-oi--oi-oi--------------------'
+# Clear everything
+vector='---0-1--1---1--1--------------------'
+vector='---101-01--01-01--------------------'
+vector='---101-01--01-01--------------------'
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+# Set FF 1
+vector='---101-01--01-01--------------------'
+vector='---110-01--01-01--------------------'
+vector='---111-01--01-01--------------------'
+
+# Set FF 2
+vector='---111-10--01-01--------------------'
+vector='---111-11--01-01--------------------'
+
+# Set FF 3
+vector='---111-11--10-01--------------------'
+vector='---111-11--11-01--------------------'
+
+# Set FF 4
+vector='---111-11--11-10--------------------'
+vector='---111-11--11-11--------------------'
+
+
+# Define output testing. One line to set inputs so that the outputs are "0".
+# Outputs can only be loaded to -3V. The output value is not used but can be
+# useful. The L defines which outputs that should be tested. They can be on
+# a single line but can also be on several rows.
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#            'pppioi-oi--oi-oi--------------------'
+output-drive='---0-1--1---1--1--------------------'
+output-drive='---1L1-01--01-01--------------------'
+
+output-drive='---0-1--1---1--1--------------------'
+output-drive='---101-L1--01-01--------------------'
+
+output-drive='---0-1--1---1--1--------------------'
+output-drive='---101-01--L1-01--------------------'
+
+output-drive='---0-1--1---1--1--------------------'
+output-drive='---101-01--01-L1--------------------'
+
+
+
+# output-drives-strength defines how much current the outputs can sink. This is a value is what
+# the tester will load the output with.
+
+
+# Those two values will define the voltage drop over the transistor compared top ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+# In this example the drop might be ok if it in between 0 .. -300mV. -150 mV +/-150mV
+output-voltage-high='-150mV'
+output-voltage-margin='150mV'
