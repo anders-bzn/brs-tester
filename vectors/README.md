@@ -15,6 +15,7 @@ This table contains status of the different test vectors. A test vector should h
 |b152.fct     | OK   |    |                                     |
 |b165.fct     | OK   |    |                                     |
 |b169.fct     | OK   |    |                                     |
+|b204.fct     | I    |    |Test resistor inputs                 |
 |b213.fct     | I    |    |Need sw support for pulse            |
 |g209.fct     | I    |    |Need sw and hw for testing           |
 |g219.fct     | I    |    |Need sw and hw for testing           |
