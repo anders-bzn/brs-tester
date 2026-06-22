@@ -33,6 +33,7 @@ This table contains status of the different test vectors. A test vector should h
 |s220.fct     | I    |    |Needs '0' output load tests          |
 |s151.fct     | OK   |    |                                     |
 |s181.fct     | OK   |    |                                     |
+|s602.fct     | I    |    |Need hw for pulse measurement        |
 |s603.fct     | I    |    |Need hw for pulse measurement        |
 |w005.fct     | OK   |    |                                     |
 |w300.fct     | OK   |    |                                     |
