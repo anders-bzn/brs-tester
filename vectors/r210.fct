@@ -1,0 +1,533 @@
+# Test for R210, Accumulator slice flip-chip
+# Multiple DCD inputs for Clear Set
+# A logic 1 = -3V and a logic 0 = 0V
+# The Flip-Flops will be in an unknown state until after step 2
+# All functions verified but the input current definitions may need adjustments
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# ! DO NOT TEST THE R210 IN AN UNMODIFIED BRS-TESTER  !
+# ! PINS BA & BB ARE SIGNALS AND NOT +10/-15 RAILS    !
+# ! AT BEST, YOU'LL BLOW THE 10V FUSE.                !
+# ! SEE END OF FILE FOR A REQUIRED HARDWARE MOD       !
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# flip-flop DCD pair 1 (used as RAL in PDP-8 accumulator)
+# AT and AU are the JK inputs
+# AV is the shared clock pulse input
+# AR is the direct clear input
+# AS is the direct set input
+# AE is the input mixer (connected to direct set)
+# AF and AP are the 0 and 1 outputs respectively
+#
+
+# -3V = Logic '1'
+#  0V = Logic '0'
+# Define the limits when testing inputs
+# Inputs are 11mA load at gnd; Refer F-85 PDP-8 Users Handbook
+# input-current-low (current at logic '0')
+# input-current-high (current at logic '1')
+input-current-low='-1.0mA'
+input-current-high='-11.0mA'
+input-current-margin='11.0mA'
+input-voltage-low='-3700mV'
+input-voltage-high='-100mV'
+
+#
+# Define how much current the outputs can sink
+# 11mA on the 0 Output and 13mA on the 1 Output
+output-drive-strength='11mA'
+
+# The 'config' key describes how the tested board has it connections.
+#
+# 'p' - power pin, do nothing
+# 'i' - input pin on tested board
+# 'o' - output pin on tested board
+# 'O' - output pin on tested board, open collector
+# 'd' - pull down net on tested board
+# 'g' - pin should be grounded on tested board
+# '-' - pin should not be used, don't care and it will be electrically disconnected
+
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+config='pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# Hold all of the control inputs inactive, ignore the outputs
+vector='---11-1-1000-11111---111111111111111'
+
+# Let's clear the flip-flop with the direct clear input
+# Drive AR Direct Clear input active, check both outputs
+vector='---1111-1000001111---111111111111111'
+# Drive AR Direct Clear input inactive, check both outputs
+vector='---1111-1000011111---111111111111111'
+
+# Let's set the flip-flop with the direct set input
+# Drive AS Direct Set input active, check both outputs
+vector='---1101-1000110111---111111111111111'
+# Drive AS Direct Set input inactive, check for no change on the outputs
+vector='---1101-1000111111---111111111111111'
+
+# Let's clear and set the flip-flop again using the input mixer
+# Clear it:
+vector='---1111-1000001111---111111111111111'
+vector='---1111-1000011111---111111111111111'
+# Drive AE mixer input active, check both outputs
+vector='----00--1000111111---111111111111111'
+# Drive AE mixer input inactive, check for no change on the outputs
+vector='---1101-1000111111---111111111111111'
+
+# Test the various DCD inputs. Tests follow a basic pattern:
+# 0. Setup by setting the flip-flop
+# 0.1: Activate the direct set input
+# 0.2: Deactivate the direct set input
+# 1. Test setting the flip-flop
+# 1.1: Activate the level input (enable)
+# 1.2: Activate the edge input (clock)
+# 1.3: Deactivate the edge input
+# 1.4: Deactivate the level input
+# 2. Test clearing the flip-flop
+# 1.1: Activate the level input (enable)
+# 1.2: Activate the edge input (clock)
+# 1.3: Deactivate the edge input
+# 1.4: Deactivate the level input
+
+####################################################################
+# Testing CLK: AV   JK inputs: AT/AU
+####################################################################
+# 0. Setup
+# Drive AR Direct Set input active, check both outputs
+vector='---1101-1000110111---111111111111111'
+# Drive AR Direct Set input inactive, check both outputs
+vector='---1101-1000111111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 1.1 Drive the AT Level Input active, check for no change on the outputs
+vector='---1101-1000111011---111111111111111'
+# 1.2 Drive the AV Pulse Input active, flip-flip should be cleared
+vector='---1111-1000011010---111111111111111'
+# 1.3 Drive the AV Pulse Input inactive, flip-flip should stay cleared
+vector='---1111-1000011011---111111111111111'
+# 1.4 Drive the AT Level Input inactive, check for no change on the outputs
+vector='---1111-1000011111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 2.1 Drive the AU Level Input active, check for no change on the outputs
+vector='---1111-1000011101---111111111111111'
+# 2.2 Drive the AV Pulse Input active, flip-flip should be set
+vector='---1101-1000111100---111111111111111'
+# 2.3 Drive the AV Pulse Input inactive, check for no change on the outputs
+vector='---1101-1000111101---111111111111111'
+# 2.4 Drive the AU Level Input inactive, check for no change on the outputs
+vector='---1101-1000111111---111111111111111'
+
+
+####################################################################
+# Testing CLK: BJ   JK inputs: BA/BB
+####################################################################
+#
+# The BRS Tester has reserved A,B and C on both connectors for supply
+# rails. The R210 uses BA & BB for signals.
+# By instead connecting BA & BB to AF & AP respectively, this will
+# turn the BJ input into a rising voltage edge triggered toggle for
+# the flip-flop. See end of file for board modification instructions
+#
+# 0. Setup
+# Drive AS Direct Set input active, check both outputs
+vector='---1101-1000110111---111111111111111'
+# Drive AS Direct Set input inactive, check both outputs
+vector='---1101-1000111111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 1.2 Drive the BJ Pulse Input active, flip-flip should be cleared
+vector='---11-1-1000-11111---111101111111111'
+# 1.3 Drive the BK Pulse Input inactive, flip-flip should stay cleared
+vector='---1111-1000011111---111111111111111'
+
+
+# 1.1 The BB Level input is held to GND by hardware mod. See end of file
+# 1.2 Drive the BJ Pulse Input active, flip-flip should be set
+vector='---11-1-1000-11111---111101111111111'
+# 1.3 Drive the BJ Pulse Input inactive, flip-flip should stay set
+vector='---1101-1000111111---111111111111111'
+
+
+
+####################################################################
+# Testing CLK: BK   JK inputs: BD/BE
+####################################################################
+# 0. Setup
+# Drive AS Direct Set input active, check both outputs
+vector='---1101-1000110111---111111111111111'
+# Drive AS Direct Set input inactive, check both outputs
+vector='---1101-1000111111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 1.1 Drive the BD Level Input active, check for no change on the outputs
+vector='---1101-1000111111---011111111111111'
+# 1.2 Drive the BK Pulse Input active, flip-flip should be cleared
+vector='---1111-1000011111---011110111111111'
+# 1.3 Drive the BK Pulse Input inactive, flip-flip should stay cleared
+vector='---1111-1000011111---011111111111111'
+# 1.4 Drive the BD Level Input inactive, check for no change on the outputs
+vector='---1111-1000011111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 2.1 Drive the BE Level Input active, check for no change on the outputs
+vector='---1111-1000011111---101111111111111'
+# 2.2 Drive the BK Pulse Input active, flip-flip should be set
+vector='---1101-1000111111---101110111111111'
+# 2.3 Drive the BK Pulse Input inactive, check for no change on the outputs
+vector='---1101-1000111111---101111111111111'
+# 2.4 Drive the BE Level Input inactive, check for no change on the outputs
+vector='---1101-1000111111---111111111111111'
+
+
+####################################################################
+# Testing CLK: BL   JK inputs: BF/BH
+####################################################################
+# 0. Setup
+# Drive AR Direct Set input active, check both outputs
+vector='---1101-1000110111---111111111111111'
+# Drive AR Direct Set input inactive, check both outputs
+vector='---1101-1000111111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 1.1 Drive the BF Level Input active, check for no change on the outputs
+vector='---1101-1000111111---110111111111111'
+# 1.2 Drivwethe BL Pulse Input active, flip-flip should be cleared
+vector='---1111-1000011111---110111011111111'
+# 1.3 Drive the BL Pulse Input inactive, flip-flip should stay cleared
+vector='---1111-1000011111---110111111111111'
+# 1.4 Drive the BF Level Input inactive, check for no change on the outputs
+vector='---1111-1000011111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 2.1 Drive the BH Level Input active, check for no change on the outputs
+vector='---1111-1000011111---111011111111111'
+# 2.2 Drive the BL Pulse Input active, flip-flip should be set
+vector='---1101-1000111111---111011011111111'
+# 2.3 Drive the BL Pulse Input inactive, check for no change on the outputs
+vector='---1101-1000111111---111011111111111'
+# 2.4 Drive the BH Level Input inactive, check for no change on the outputs
+vector='---1101-1000111111---111111111111111'
+
+
+####################################################################
+# Testing CLK: BP/AK   JK inputs: BV/BU
+# Note: For this set, it's a bit curious
+# D-8P-0-2 shows two clocks: BP (run of the mill falling edge)
+# The second is AK is shown as an active high level but in practice
+# operates as a rising edge clock
+####################################################################
+# 0. Setup
+# Drive AS Direct Set input active, check both outputs
+vector='---11-1-0000-10111---111111111111111'
+# Drive AS Direct Set input inactive, check both outputs
+vector='---1101-0000111111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 1.1 Drive the BV Level Input active, check for no change on the outputs
+vector='---1101-0000111111---111111111111110'
+# 1.2 Drive the BP Pulse & AK Level Inputs active, flip-flip should be cleared
+vector='---1111-1000011111---111111111011110'
+# 1.3 Drive the BP Pulse  & AK Level Inputs inactive, flip-flip should stay cleared
+vector='---1111-1000011111---111111111111110'
+# 1.4 Drive the BV Level Input inactive, check for no change on the outputs
+vector='---1111-0000011111---111111111111111'
+
+# 2.0 Setup: Clear the flip-flop with the direct clear input
+# Drive AR Direct Clear input active, check both outputs
+vector='---1111-1000001111---111111111111111'
+# Drive AR Direct Clear input inactive, check both outputs
+vector='---1111-1000011111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 2.1 Drive the BU Level Input active, check for no change on the outputs
+vector='---1111-0000011111---111111111111101'
+# 2.2 Drive the BP Pulse Input active, flip-flip should be set
+vector='---1101-0000111111---111111111011101'
+# 2.3 Drive the BP Pulse Input inactive, check for no change on the outputs
+vector='---1101-0000111111---111111111111101'
+# 2.4 Drive the BU Level Input inactive, check for no change on the outputs
+vector='---1101-0000111111---111111111111111'
+
+####################################################################
+# Now to test instances of a independant inputs ie. non shared clock
+#
+# Testing CLK: BR   JK inputs: AK/--
+####################################################################
+# 0. Setup
+# Drive AS Direct Set input active, check both outputs
+vector='---1101-1000110111---111111111111111'
+# Drive AS Direct Set input inactive, check both outputs
+vector='---1101-1000111111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 1.1 Drive the AK Level Input active, check for no change on the outputs
+vector='---1101-0000111111---111111111111111'
+# 1.2 Drive the BR Pulse Input active, flip-flip should be cleared
+vector='---1111-0000011111---111111111101111'
+# 1.3 Drive the BR Pulse Input inactive, flip-flip should stay cleared
+vector='---1111-0000011111---111111111111111'
+
+
+####################################################################
+# Testing CLK: BN   JK inputs: --/BS
+####################################################################
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 0. Setup: Let's clear the flip-flop with the direct clear input
+# Drive AR Direct Clear input active, check both outputs
+vector='---1111-1000001111---111111111111111'
+# Drive AR Direct Clear input inactive, check both outputs
+vector='---1111-1000011111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 2.1 Driving the BS Level Input active alone will trigger the DCD gate
+# due to cap C21. So just set them concurrently.
+# 2.2 Drive the BS Level & BN Pulse Input active, flip-flip should be set
+vector='---1101-1000111111---111111110110111'
+# 2.3 Drive the BN Pulse Input inactive, check for no change on the outputs
+vector='---1101-1000111111---111111111110111'
+# 2.4 Drive the BS Level Input inactive, check for no change on the outputs
+vector='---1101-1000111111---111111111111111'
+
+
+
+####################################################################
+# Testing CLK: BM   JK inputs: --/BT
+####################################################################
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 0. Setup: Let's clear the flip-flop with the direct clear input
+# Drive AS Direct Clear input active, check both outputs
+vector='---1111-1000001111---111111111111111'
+# Drive AR Direct Clear input inactive, check both outputs
+vector='---1111-1000011111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 2.1 Drive the BS Level Input active, check for no change on the outputs
+vector='---1111-1000011111---111111111111011'
+# 2.2 Drive the BN Pulse Input active, flip-flip should be set
+vector='---1101-1000111111---111111101111011'
+# 2.3 Drive the BN Pulse Input inactive, check for no change on the outputs
+vector='---1101-1000111111---111111111110011'
+# 2.4 Drive the BS Level Input inactive, check for no change on the outputs
+vector='---1101-1000111111---111111111111111'
+
+
+####################################################################
+# Test the complement input (AM) toggling the flip flop
+####################################################################
+# Give a positive going edge to toggle the output
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 0. Setup: Let's clear the flip-flop with the direct clear input
+# Drive AS Direct Clear input active, check both outputs
+vector='---1111-1000001111---111111111111111'
+# Drive AR Direct Clear input inactive, check both outputs
+vector='---1111-1000011111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# Give a rising edge on the AM toggle input to SET the flip flop
+vector='---11-1-1010-11111---111111111111111'
+# Drop the clock to low. Output remains unchanged
+vector='---1101-1000111111---111111111111111'
+# Give a rising edge on the AM toggle input to CLEAR the flip flop
+vector='---11-1-1010-11111---111111111111111'
+# Drop the clock to low. Output remains unchanged
+vector='---1111-1000011111---111111111111111'
+
+####################################################################
+# Test the EAE Link complement input (AN/AK) toggling the flip flop
+####################################################################
+# Give a positive going edge to toggle the output
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 0. Setup: Let's clear the flip-flop with the direct clear input
+# Drive AS Direct Clear input active, check both outputs
+vector='---1111-1000001111---111111111111111'
+# Drive AR Direct Clear input inactive, check both outputs
+vector='---1111-1000011111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 1.1 Drive the AK Level Input active, check for no change on the outputs
+vector='---1111-1000011111---111111111111111'
+# 1.2 Drive the AN Pulse & AK Level Inputs active, flip-flip should be set
+vector='---1101-1001111111---111111111111111'
+# 1.3 Drive the BP Pulse  & AK Level Inputs inactive, flip-flip should stay set
+vector='---1101-1000111111---111111111111111'
+# 1.4 Drive the BV Level Input inactive, check for no change on the outputs
+vector='---1101-0000111111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 1.1 Drive the AK Level Input active, check for no change on the outputs
+vector='---1101-1000111111---111111111111111'
+# 1.2 Drive the AN Pulse & AK Level Inputs active, flip-flip should be cleared
+vector='---1111-1001011111---111111111111111'
+# 1.3 Drive the BP Pulse  & AK Level Inputs inactive, flip-flip should stay cleared
+vector='---1111-1000011111---111111111111111'
+# 1.4 Drive the BV Level Input inactive, check for no change on the outputs
+vector='---1111-0000011111---111111111111111'
+
+####################################################################
+# Test the big NAND gate. Inputs: AK/AL/??  Output: AJ
+####################################################################
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+vector='---11-110000-11111---111111111111111'
+vector='---11-111000-11111---111111111111111'
+vector='---11-110100-11111---111111111111111'
+vector='---11-101100-11111---111111111111111'
+
+####################################################################
+# Test the complement DCD gate: CLK: AD   Level input: AH
+####################################################################
+# 0. Setup
+# Drive AS Direct Set input active, check both outputs
+vector='---1101-1010110111---111111111111111'
+# Drive AS Direct Set input inactive, check both outputs
+vector='---1101-1010111111---111111111111111'
+
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 1.1 Drive the AH Level Input active, check for no change on the outputs
+vector='---1100-0010111111---111111111111111'
+# 1.2 Drive the AD Pulse Input active, flip-flip should be cleared
+vector='---0110-0010011111---111111111111111'
+# 1.3 Drive the AD Pulse Input inactive, flip-flip should stay cleared
+vector='---1110-0010011111---111111111111111'
+# 1.4 Drive the AH Level Input inactive, check for no change on the outputs
+vector='---1111-1010011111---111111111111111'
+# # Now toggle it to set
+# 1.1 Drive the AH Level Input active, check for no change on the outputs
+vector='---1110-0010011111---111111111111111'
+# 1.2 Drive the AD Pulse Input active, flip-flip should be set
+vector='---0100-0010111111---111111111111111'
+# 1.3 Drive the AD Pulse Input inactive, flip-flip should stay set
+vector='---1100-0010111111---111111111111111'
+# 1.4 Drive the AH Level Input inactive, check for no change on the outputs
+vector='---1101-1010111111---111111111111111'
+
+
+####################################################################
+# Wiggle the Level Inputs, check for no change on the outputs
+####################################################################
+#       AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB TODO DO ALL OF THEM
+#       ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#config'pppiioioiiiioiiiiipppiiiiiiiiiiiiiii'
+# 0. Setup
+# Drive AR Direct Set input active, check both outputs
+vector='---1101-1000110111---111111111111111'
+# Drive AR Direct Set input inactive, check both outputs
+vector='---1101-1000111111---111111111111111'
+
+# Now wiggle level inputs randomly
+vector='---1101-1000111001---111111111111111'
+vector='---1101-1000111111---111111111111111'
+
+
+#             AAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBB
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#             pppiioioiiiioiiiiipppiiiiiiiiiiiiii-
+# Set all inputs to inactive and use direct set and clear to configure flip-flop
+# Drive AR Direct Set input active
+output-drive='---1101-1010110111---111111111111111'
+# Drive AR Direct Set input inactive and load the '1' output
+output-drive='---11L1-1010-11111---111111111111111'
+
+# Drive AR Direct Clear input active
+output-drive='---1111-1010-01111---111111111111111'
+# Drive AR Direct Clear input inactive and load the '0' output
+output-drive='---1111-1010L11111---111111111111111'
+
+# LOAD TEST the CARRY OUTPUT.
+
+# output-drives-strength defines how much current the outputs can sink.
+# This is a value is what the tester will load the output with.
+output-drive-strength='18mA'
+
+# Those two values will define the voltage drop over the transistor compared to ground. First
+# the nominal value and then a margin that defines how much the value could diff from that.
+output-voltage-high='-150mV'
+output-voltage-margin='100mV'
+
+
+####################################################################################
+#
+# Making an adapter for testing pins BA & BB
+#
+# The R210 has no spare signals.
+# Pins DA & DB are signals rather than power supplies
+#
+# The following instructions allow you to build an interposing board between the
+# brs-tester and connector board. See photo in the Drawings directory.
+#
+# Build details:
+#
+# Taking a spare connector PCB, fit the JP1,2,3,4 connectors. Leave the edge
+# connectors unfitted, we will used those to jumper signals.
+#
+# Modify the connector board:
+# 1. Cut track from JP3 (on the -> Tester side) to BA2
+# 2. Cut track from JP3 (on the -> Tester side) to BB2
+# 3. Jumper BA2 to AF2
+# 4. Jumper BB2 to AP2
+#
+# This has the effect of
+# - Connecting the level input on the DCD gate driving the FF clear to ~Q
+# - Connecting the level input on the DCD gate driving the FF set to Q
+# - Converting BJ input into a complement signal
+#
+# Failure to toggle indicates a fault in one of the two DCD gates.
+#
+#
+#             CCCCCCCCCCCCCCCCCCDDDDDDDDDDDDDDDDDD
+#             ABCDEFHJKLMNPRSTUVABCDEFHJKLMNPRSTUV
+#             pppooooi--iiiiiiiipppiiiiiooiiiiiiii
+#                  |      |     ||
+#                  |      \______/
+#                  |            |
+#                  \____________/
+#
+#
+####################################################################################
